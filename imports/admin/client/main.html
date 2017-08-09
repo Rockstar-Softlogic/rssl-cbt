@@ -1,0 +1,430 @@
+<template name="staffDashboard">
+	{{#if Template.subscriptionsReady}}
+		<div class="row" id="staffDashboard">
+			<div class="col-md-5 sms-offset-1">
+			<h4 class="text-default">Examinations</h4><hr/>
+				{{#if count}}
+					{{#with count}}
+						<h5><a href="{{pathFor 'examsList'}}">Total Exams: <span class="badge">{{total}}</span></a></h5>
+						<h5>Published Exams: <span class="badge">{{publish}}</span>, Unpublish Exams: <span class="badge">{{unpublish}}</span></h5>
+					{{/with}}
+
+				{{else}}
+					<p class="text-info">You've not set or upload any examinations.</p>
+				{{/if}}
+				<a href="{{pathFor 'newExam'}}" class="btn btn-primary"><span class="fa fa-plus"></span> New Exam</a>
+				<a href="{{pathFor 'uploadExam'}}" class="btn btn-primary"><span class="fa fa-upload"></span> Upload Exam</a>
+			</div>
+			<div class="col-md-5 sms-offset-1">
+				<h4 class="text-default">General Information</h4><hr/>
+				{{#if sessionInfo}}
+					{{#with sessionInfo}}
+						<h5>Current Session: {{session}}</h5>
+						<h5>Current Term: {{term}}</h5>
+					{{/with}}
+
+				{{else}}
+					<p class="text-warning">No session or term is currently set. Create new session below.</p>
+				{{/if}}	
+				<button id="newSession" class="btn btn-danger">New Session</button>
+				<button id="newTerm" class="btn btn-danger">New Term</button>
+
+			</div>
+			<div class="col-md-5 sms-offset-1">
+				
+			</div>
+			<div class="col-md-5 sms-offset-1">
+				
+			</div>
+		</div>
+	{{else}}
+		{{>smsLoading}}
+	{{/if}}
+</template>
+
+<template name="profile">
+	{{#if Template.subscriptionsReady}}
+	{{#with user}}
+		<div class="col-md-7">
+			<p><b>Email: {{emails.[0].address}}</b></p>
+			{{#if profile}}
+				{{#with profile}}
+				<table class="table">
+					<tr>
+						<td><strong>Last Name</strong></td><td>{{lastName}}</td>
+					</tr>
+					<tr>
+						<td><strong>First Name</strong></td><td>{{firstName}}</td>
+					</tr>
+					<tr>
+						<td><strong>Other Name</strong></td><td>{{otherName}}</td>
+					</tr>
+					<tr>
+						<td><strong>Gender</strong></td><td>{{gender}}</td>
+					</tr>
+					<tr>
+						<td><strong>Date of Birth</strong></td><td>{{dob}}</td>
+					</tr>
+					<tr>
+						<td><strong>Subject Taught</strong></td><td>{{subjectTaught}}</td>
+					</tr>
+					<tr>
+						<td><strong>Contact Number</strong></td><td>{{phone}}</td>
+					</tr>
+					<tr>
+						<td><strong>Address</strong></td><td>{{address}}</td>
+					</tr><br/>
+					<tfoot>
+						<a href="{{pathFor 'profileUpdate'}}" class="btn btn-primary btn-xs">Edit Profile</a>
+						
+					</tfoot>
+				</table>
+		
+				{{/with}}
+			{{else}}
+			<p>No profile found</p>
+			<a href="{{pathFor 'profileUpdate'}}" class="btn btn-primary btn-xs">Update Profile</a>
+			{{/if}}
+		</div>
+	{{/with}}
+	{{else}}
+		{{>smsLoading}}
+	{{/if}}
+</template>
+
+<template name="profileUpdate">
+	{{#if Template.subscriptionsReady}}
+	<h2>Update your profile</h2>
+	{{> quickForm schema="g.Schemas.Staff" id="profileUpdate" type="normal" doc=profile}}
+	{{else}}
+		{{>smsLoading}}
+	{{/if}}
+</template>
+
+
+<template name="examsList">
+	{{#if Template.subscriptionsReady}}
+	<div class="col-md-12">
+		<h2>Examinations Listing</h2>
+		<a href="{{pathFor 'newExam'}}" class="btn btn-primary"><span class="fa fa-plus"></span> New Exam</a>
+		<a href="{{pathFor 'uploadExam'}}" class="btn btn-primary"><span class="fa fa-upload"></span> Upload Exam</a>
+		<hr/>
+		<form>
+			<select name="examClass">
+				<option value="JSS1">JSS1</option>
+				<option value="JSS2">JSS2</option>
+				<option value="JSS3">JSS3</option>
+				<option value="SSS1">SSS1</option>
+				<option value="SSS2">SSS2</option>
+				<option value="SSS1">SSS3</option>
+			</select>
+			<select name="examSubject">
+				{{#each subjects}}
+				<option value="{{this}}">{{this}}</option>
+				{{/each}}
+			</select>
+			<input type="checkbox" name="publish"> Published
+			<button type="submit" class="btn btn-primary btn-xs">Filter Exams</button>
+			<button type="button" id="showAllExams" class="btn btn-primary btn-xs">Show all Exams</button>
+		</form>
+		{{#if exams}}
+				<table class="table serial">
+					<tr>
+						<th>S/N</th>
+						<th>Subject</th>
+						<th>Class</th>
+						<th>Status</th>
+						<th>Session, term</th>
+						<th>Action</th>
+					</tr>
+					{{#each exams}}
+					<tr>
+						<td></td>
+						<td>{{subject}} ({{count}} questions)</td>
+						<td>{{class}}</td>
+						<td>{{#if publish}}Published{{else}}Not Published{{/if}}</td>
+						<td>{{session}}, {{term}}</td>
+						<td>
+							<a href="{{pathFor 'singleExam'}}/{{_id}}" class="btn btn-info btn-xs"><span class="fa fa-info"></span> View</a>
+							<a href="{{pathFor 'editExam'}}/{{_id}}" class="btn btn-primary btn-xs"><span class="fa fa-pencil"></span> Edit</a>
+							<button class="btn btn-danger btn-xs" id="removeExam"><span class="fa fa-trash"></span> Remove</button>
+
+						</td>
+					</tr>
+					{{/each}}
+				</table>
+		{{else}}
+		<h3>You've not set or upload any exam.</h3>	
+		{{/if}}
+
+	</div>
+	{{else}}
+		{{>smsLoading}}
+	{{/if}}
+</template>
+
+<template name="newExam">
+	<div class="col-md-offset-1 col-md-8">
+		<h3>Create new Exam</h3><hr/>
+		{{> quickForm schema="g.Schemas.Exam" id="newExam" type="normal" validation='blur'}}
+	</div>
+</template>
+
+<template name="uploadExam">
+	<div class="col-md-offset-1 col-md-10" id="uploadExam">
+		<h4 id="uploadFormatToggle" style="color:navy;cursor:pointer;"><span class="fa fa-fw fa-angle-right"></span>Click to show upload format(Excel format .xlsx and .ods only)</h4>
+		<table id="uploadFormat" style="display:none;">
+			<tr>
+				<th>Id</th>
+				<th>Question</th>
+				<th>Option A</th>
+				<th>Option B</th>
+				<th>Option C</th>
+				<th>Option D</th>
+				<th>Answer</th>
+			</tr>
+			<tr>
+				<td>1</td><td>Which is not a part of speech?</td><td>Verb</td><td>Verbal</td><td>Adverb</td><td>Noun</td><td>Verbal</td>
+			</tr>
+			<tr>
+				<td>2</td><td>What is a verb?</td><td>A verb is a name of person.</td><td>Is a part of speech.</td><td>Verb is a doing word.</td><td>A verb is similar to a noun</td><td>Verb is a doing word.</td>
+			</tr>
+		</table>
+			<label>Select an excel file to upload.</label><br/>
+			<input type="file" name="excelFile" id="file">
+		<br/>
+		<form>
+			<select name="examClass" required>
+				<option value="" disabled selected>Select Class</option>
+				<option value="JSS1">JSS1</option>
+				<option value="JSS2">JSS2</option>
+				<option value="JSS3">JSS3</option>
+				<option value="SSS1">SSS1</option>
+				<option value="SSS2">SSS2</option>
+				<option value="SSS1">SSS3</option>
+			</select>
+			<select name="examSubject" required>
+				<option value="" disabled selected>Select Subject</option>
+				{{#each subjects}}
+				<option value="{{this}}">{{this}}</option>
+				{{/each}}
+			</select>
+			<input type="number" name="minute" required placeholder="Time taken" min="10" max="180">
+			<input type="checkbox" name="publish" value=""> Publish now
+			<button type="submit" class="btn btn-danger">Confirm Upload</button>
+		</form>
+		<h3>Upload Preview</h3>
+		<span class="text-info"><b>Please review the questions before finally uploading.</b></span><hr/>
+		<div id="examPreview">
+			
+		</div>
+	</div>
+	<div class="processUpload" style="display:none;">
+		{{>smsLoading}}
+	</div>
+</template>
+
+<template name="singleExam">
+	{{#if Template.subscriptionsReady}}
+		<div class="col-md-offset-1 col-md-8" id="singleExam">
+			{{#with exam}}
+				<table class="table">
+					<tr>
+						<td>Class: {{class}}</td>
+						<td>Availability: {{#if publish}}Published to Students{{else}}Not Published to Student{{/if}}</td>
+						<td>Session: {{session}}</td>
+					</tr>
+					<tr>
+						<td>Subject: {{subject}} ({{count}} questions)</td>
+						<td>Time Given: {{minute}} minutes</td>
+						<td>Term: {{term}}</td>
+
+					</tr>
+				</table>
+				{{#each questions}}
+				<div class="question" id="{{id}}">
+					<p><span>{{id}}</span>. {{question}}</p>
+					<span>A. <input type="radio" name="q{{id}}" value="{{a}}"> {{a}}</span><br/>
+					<span>B. <input type="radio" name="q{{id}}" value="{{b}}"> {{b}}</span><br/>
+					{{#if c}}
+						<span>C. <input type="radio" name="q{{id}}" value="{{c}}"> {{c}}</span><br/>
+					{{/if}}
+					
+					{{#if d}}
+						<span>D. <input type="radio" name="q{{id}}" value="{{d}}"> {{d}}</span><br/>
+					{{/if}}
+
+					<p><b>Answer: {{answer}}</b></p>
+				</div>
+
+				<hr/>
+				{{/each}}
+				
+				<div class="questionLink">
+					<p><span class="text-info"><b>Questions Navigation</b></span></p>
+					{{#each questions}}
+					<a href="#{{id}}" class="" title="Question {{id}}">{{id}}</a>
+					{{/each}}
+				</div>
+				
+			{{/with}}
+		</div>
+	{{else}}
+		{{> smsLoading}}
+	{{/if}}
+</template>
+
+<template name="editExam">
+	{{#if Template.subscriptionsReady}}
+		<div class="col-md-offset-2 col-md-8">
+			<h3>Editing Exam</h3><hr/>
+			{{> quickForm schema="g.Schemas.Exam" id="editExam" type="normal" validation='blur' doc=exam}}
+		</div>
+	{{else}}
+		{{>smsLoading}}
+	{{/if}}
+
+	<div class="processUpload" style="display:none;">
+		{{> smsLoading}}
+	</div>
+</template>
+
+<template name="studentList">
+	{{#if Template.subscriptionsReady}}
+		<div class="col-md-offset-1 col-md-10">
+			<h3>Students List <a href="{{pathFor 'newStudent'}}" class="btn btn-primary btn-xs"><span class="fa fa-plus"></span> Add Student</a></h3><hr/>
+			{{#if students}}
+				<table class="serial table">
+					<tr>
+						<th>S/N</th>
+						<th>Name</th>
+						<th>Student Id</th>
+						<th>Class</th>
+						<th>Action</th>
+					</tr>
+				{{#each students}}
+					<tr>
+						<td></td>
+						<td>{{profile.lastName}}, {{profile.firstName}} {{profile.otherName}}</td>
+						<td>{{username}}</td>
+						<td>{{profile.currentClass}}</td>
+						<td><a href="{{pathFor 'editStudent'}}/{{_id}}" class="btn btn-primary btn-xs"><span class="fa fa-pencil"></span> Edit</a></td>
+					</tr>
+
+				{{/each}}
+				</table>
+			{{else}}
+				<h3>No student a added yet.</h3>
+			{{/if}}
+		</div>
+		{{else}}
+			{{>smsLoading}}
+		{{/if}}
+</template>
+<template name="newStudent">
+		<div class="col-md-offset-2 col-md-6">
+			<h3>New Student</h3><hr/>
+			
+			{{> quickForm schema="g.Schemas.Student" id="newStudent" type="normal" validation='blur'}}
+		</div>
+</template>
+
+<template name="uploadStudent">
+		<div class="col-md-offset-2 col-md-10">
+			<h3>Upload Students List</h3><hr/>
+		
+		</div>
+</template>
+
+<template name="editStudent">
+	{{#if Template.subscriptionsReady}}
+		<div class="col-md-offset-1 col-md-6">
+			<h3>Update student Data</h3><hr/>
+		
+			{{> quickForm schema="g.Schemas.Student" id="editStudent" type="normal" validation='blur' doc=student}}
+		</div>
+		{{else}}
+			{{>smsLoading}}
+		{{/if}}
+</template>
+
+
+
+
+<template name="staffList">
+	{{#if Template.subscriptionsReady}}
+		<div class="col-md-offset-1 col-md-10">
+			<h3>Staff List <a href="{{pathFor 'newStaff'}}" class="btn btn-primary btn-xs"><span class="fa fa-plus"></span> Add Staff</a></h3><hr/>
+			{{#if staffs}}
+				<table class="serial table">
+					<tr>
+						<th>S/N</th>
+						<th>Name</th>
+						<th>Staff Id</th>
+						<th>Action</th>
+					</tr>
+				{{#each staffs}}
+					<tr>
+						<td></td>
+						<td>{{profile.lastName}}, {{profile.firstName}} {{profile.otherName}}</td>
+						<td>{{username}}</td>
+						<td><a href="{{pathFor 'editStaff'}}/{{_id}}" class="btn btn-primary btn-xs"><span class="fa fa-pencil"></span> Edit</a></td>
+					</tr>
+
+				{{/each}}
+				</table>
+			{{else}}
+				<h3>No staff a added yet.</h3>
+			{{/if}}
+		</div>
+		{{else}}
+			{{>smsLoading}}
+		{{/if}}
+</template>
+<template name="newStaff">
+		<div class="col-md-offset-2 col-md-6">
+			<h3>New Staff</h3><hr/>
+			
+			{{> quickForm schema="g.Schemas.Staff" id="newStaff" type="normal" validation='blur'}}
+		</div>
+</template>
+
+<template name="editStaff">
+	{{#if Template.subscriptionsReady}}
+		<div class="col-md-offset-1 col-md-6">
+			<h3>Update Staff Data</h3><hr/>
+		
+			{{> quickForm schema="g.Schemas.Staff" id="editStaff" type="normal" validation='blur' doc=staff}}
+		</div>
+		{{else}}
+			{{>smsLoading}}
+		{{/if}}
+</template>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

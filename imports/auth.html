@@ -1,0 +1,223 @@
+
+<!--Template for all Authenticated Users -->
+
+<!--Template for all staff Users -->
+<!--Template for all staff Users -->
+<!--Template for all staff Users -->
+<!--Template for all staff Users -->
+<!--Template for all staff Users -->
+<!--Template for all staff Users -->
+
+<template name="header">
+	<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+			<div class="navbar-header">
+	           <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+	                <span class="sr-only">Toggle navigation</span>
+	                <span class="icon-bar"></span>
+	                <span class="icon-bar"></span>
+	                <span class="icon-bar"></span>
+	            </button>
+	            <a class="navbar-brand" href="/dashboard">
+	                <img src="/logo.jpg" alt="School Logo" style="max-width: 50px;">
+	            </a>
+	            <h4 style="color:#fff;display:inline;">
+	            	CBT Application
+	            </h4>
+	        </div>
+	         <!-- Top Menu Items -->
+	        <ul class="nav navbar-right top-nav">
+	            <li><a href="#" data-placement="bottom" data-toggle="tooltip" title="Messages"><i class="fa fa-envelope"></i>
+	                </a>
+	            </li>          
+	            <li class="dropdown">
+					{{#with user}}
+	                <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{username}} &nbsp;&nbsp;<b class="fa fa-ellipsis-v"></b></a>
+	                <ul class="dropdown-menu">
+	                    <li><a href="{{pathFor 'profile'}}"><i class="fa fa-fw fa-user"></i>Profile</a></li>
+	                    <li><a href="#"><i class="fa fa-fw fa-cog"></i> Change Password</a></li>
+	                    <li class="divider"></li>
+	                    <li><a href="#" id="header-logout" title="Sign out"><i class="fa fa-fw fa-power-off"></i> Logout</a></li>
+	                </ul>
+	                {{/with}}
+	            </li>
+	        </ul>
+	        <div class="collapse navbar-collapse navbar-ex1-collapse">
+		            {{> sideBar}}
+		     </div>
+		</nav>
+</template>
+
+<template name="sideBar">
+	<ul class="nav navbar-nav side-nav">
+        <li>
+            <a href="/dashboard"><i class="fa fa-fw fa-dashboard"></i> DASHBOARD</a>
+        </li>
+        <li>
+            <a href="#" data-toggle="collapse" data-target="#submenu-1"><i class="fa fa-fw fa-users"></i> EXAMINATIONS <i class="fa fa-fw fa-angle-down pull-right"></i></a>
+            <ul id="submenu-1" class="collapse">
+                <li><a href="{{pathFor 'newExam'}}"><i class="fa fa-plus"></i> Add new </a></li>
+                <li><a href="{{pathFor 'uploadExam'}}"><i class="fa fa-upload"></i> Upload new </a></li>
+                <li><a href="{{pathFor 'examsList'}}"><i class="fa fa-list"></i> Exam list </a></li>
+            </ul>
+        </li>
+        <li>
+            <a href="#" data-toggle="collapse" data-target="#submenu-5"><i class="fa fa-fw fa-users"></i> STAFFS <i class="fa fa-fw fa-angle-down pull-right"></i></a>
+            <ul id="submenu-5" class="collapse">
+                <li><a href="{{pathFor 'newStaff'}}"><i class="fa fa-user-plus"></i> Add new </a></li>
+                <li><a href="{{pathFor 'staffList'}}"><i class="fa fa-list"></i> Staff list </a></li>
+            </ul>
+        </li>
+		<li>
+            <a href="#" data-toggle="collapse" data-target="#submenu-6"><i class="fa fa-fw fa-users"></i> STUDENTS <i class="fa fa-fw fa-angle-down pull-right"></i></a>
+            <ul id="submenu-6" class="collapse">
+                <li><a href="{{pathFor 'newStudent'}}"><i class="fa fa-user-plus"></i> Add new </a></li>
+                <li><a href="{{pathFor 'uploadStudent'}}"><i class="fa fa-upload"></i> Upload new </a></li>
+                <li><a href="{{pathFor 'studentList'}}"><i class="fa fa-list"></i> Student list </a></li>
+            </ul>
+        </li>
+         <li>
+            <a href="#" data-toggle="collapse" data-target="#submenu-7"><i class="fa fa-fw fa-check-square"></i> RESULTS <i class="fa fa-fw fa-angle-down pull-right"></i></a>
+            <ul id="submenu-7" class="collapse">
+                <li><a href="/result"><i class="fa fa-list"></i> Result list </a></li>
+            </ul>
+        </li>
+        <li>
+            <a href="#"><i class="fa fa-fw fa-comment"></i> FEEDBACK</a>
+        </li>
+    </ul>
+</template>
+
+<template name="dashboard">
+	{{#if currentUser}}
+		{{#if isInRole "staff"}}
+			<div id="dashboard" class="container-fluid">
+				{{>header}}
+				 <div id="mainContent">
+			        <div class="container-fluid">
+			            <!-- Page Heading -->
+			            <div class="row" id="main" >
+			                <div class="col-sm-12 col-md-12 well" id="content" style="min-height:75vh;background:#fff;">
+								{{> Template.dynamic template=content}}
+			                </div>
+			            </div>
+			            <div class="col-sm-12 col-md-12">
+								{{> footer}}
+						</div>
+			            <!-- /.row -->
+			        </div>
+			    </div>
+			    <div class="insertNotice"></div>
+			</div>
+
+		{{/if}}
+	{{/if}}
+</template>
+
+<!--Template for all student Users -->
+<!--Template for all student Users -->
+<!--Template for all student Users -->
+<!--Template for all student Users -->
+<!--Template for all student Users -->
+<!--Template for all student Users -->
+<template name="stHeader">
+	<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+			<div class="navbar-header">
+	           <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+	                <span class="sr-only">Toggle navigation</span>
+	                <span class="icon-bar"></span>
+	                <span class="icon-bar"></span>
+	                <span class="icon-bar"></span>
+	            </button>
+	            <a class="navbar-brand" href="{{pathFor 'studentDashboard'}}">
+	                <img src="/logo.jpg" alt="School Logo" style="max-width: 50px;">
+	            </a>
+	            <h4 style="color:#fff;display:inline;">
+	            	CBT Application
+	            </h4>
+	        </div>
+	         <!-- Top Menu Items -->
+	        <ul class="nav navbar-right top-nav">
+	            <li><a href="#" data-placement="bottom" data-toggle="tooltip" title="Messages"><i class="fa fa-envelope"></i>
+	                </a>
+	            </li>          
+	            <li class="dropdown">
+					{{#with user}}
+	                <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{emails.[0].address}} &nbsp;&nbsp;<b class="fa fa-ellipsis-v"></b></a>
+	                <ul class="dropdown-menu">
+	                    <li><a href="{{pathFor 'stProfile'}}"><i class="fa fa-fw fa-user"></i>Profile</a></li>
+	                    <li><a href="#"><i class="fa fa-fw fa-cog"></i> Change Password</a></li>
+	                    <li class="divider"></li>
+	                    <li><a href="#" id="header-logout" title="Sign out"><i class="fa fa-fw fa-power-off"></i> Logout</a></li>
+	                </ul>
+	                {{/with}}
+	            </li>
+	        </ul>
+	        <div class="collapse navbar-collapse navbar-ex1-collapse">
+		            {{> stSideBar}}
+		     </div>
+		</nav>
+</template>
+
+<template name="stSideBar">
+	<ul class="nav navbar-nav side-nav">
+        <li>
+            <a href="{{pathFor 'studentDashboard'}}"><i class="fa fa-fw fa-dashboard"></i> DASHBOARD</a>
+        </li>
+        <li>
+            <a href="{{pathFor 'stExams'}}"><i class="fa fa-fw fa-list"></i> EXAMINATIONS</a>
+        </li>
+        <li>
+            <a href="{{pathFor 'stResult'}}"><i class="fa fa-fw fa-check-square"></i> RESULTS</a>
+        </li>
+        <li>
+            <a href="#"><i class="fa fa-fw fa-comment"></i> FEEDBACK</a>
+        </li>
+    </ul>
+</template>
+
+<template name="stDashboard">
+	{{#if currentUser}}
+		{{#if isInRole "student"}}
+			<div id="stDashboard">
+				{{>stHeader}}
+				<div id="mainContent">
+			        <div class="container-fluid">
+			            <!-- Page Heading -->
+			            <div class="row" id="main" >
+			                <div class="col-sm-12 col-md-12 well" id="content" style="min-height:75vh;background:#fff;">
+								{{> Template.dynamic template=stContent}}
+			                </div>
+			            </div>
+			            <div class="col-sm-12 col-md-12">
+								{{> footer}}
+						</div>
+			            <!-- /.row -->
+			        </div>
+			        <!-- /.container-fluid -->
+			    </div>
+			    <div class="insertNotice"></div>
+			</div>
+		{{/if}}
+	{{/if}}
+</template>
+
+<!--Template for footer -->
+<template name="footer">
+	<footer style = "padding: 1em; color: #fff;">
+		<div class="row">
+			<div class="col-md-6">
+				<p>
+				<span>Terms and Conditions</span>
+				<span>Privacy Policy</span>
+				<span>Official page</span>
+				</p>
+			</div>
+			<div class="col-md-6">
+				<p>Copyright &copy; Lovelamp Systems &amp; Consulting Firm</p>
+			</div>
+		</div>
+
+	</footer>
+
+</template>
+

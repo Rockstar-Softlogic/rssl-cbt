@@ -1,0 +1,277 @@
+<template name="studentDashboard">
+	{{#if Template.subscriptionsReady}}
+		<div class="row" id="studentDashboard">
+			<div class="col-md-5 sms-offset-1">
+			<h4 class="text-default">Examinations</h4><hr/>
+				{{#if count}}
+					<h4 class="text-primary">No of Available exams: <span class="badge">{{count}}</span></h4>
+				{{else}}
+					<h5 class="text-primary">No exam available</h5>
+				{{/if}}
+			</div>
+			<div class="col-md-5 sms-offset-1">
+				<h4 class="text-default">General Information</h4><hr/>
+				{{#if sessionInfo}}
+					{{#with sessionInfo}}
+						<h5>Current Session: {{session}}</h5>
+						<h5>Current Term: {{term}}</h5>
+					{{/with}}
+
+				{{else}}
+					<p class="text-info">School is currently not in session or term.</p>
+				{{/if}}	
+			</div>
+			<div class="col-md-5 sms-offset-1">
+				
+			</div>
+			<div class="col-md-5 sms-offset-1">
+				
+			</div>
+		</div>
+	{{else}}
+		{{>smsLoading}}
+	{{/if}}
+</template>
+
+<template name="stProfile">
+	{{#if Template.subscriptionsReady}}
+	{{#with user}}
+		<div class="col-md-offset-1 col-md-7">
+			<p><b>Email: {{emails.[0].address}}</b></p>
+			{{#if profile}}
+				{{#with profile}}
+				<table class="table">
+					<tr>
+						<td><strong>Current Class</strong></td><td>{{currentClass}}</td>
+					</tr>
+					<tr>
+						<td><strong>Last Name</strong></td><td>{{lastName}}</td>
+					</tr>
+					<tr>
+						<td><strong>First Name</strong></td><td>{{firstName}}</td>
+					</tr>
+					<tr>
+						<td><strong>Other Name</strong></td><td>{{otherName}}</td>
+					</tr>
+					<tr>
+						<td><strong>Gender</strong></td><td>{{gender}}</td>
+					</tr>
+					<tr>
+						<td><strong>Date of Birth</strong></td><td>{{dob}}</td>
+					</tr>
+					<tr>
+						<td><strong>Contact Number</strong></td><td>{{phone}}</td>
+					</tr>
+					<tr>
+						<td><strong>Address</strong></td><td>{{address}}</td>
+					</tr><br/>
+					<tfoot>
+						<a href="{{pathFor 'stProfileUpdate'}}" class="btn btn-primary btn-xs">Edit Profile</a>
+						
+					</tfoot>
+				</table>
+		
+				{{/with}}
+			{{else}}
+			<p>No profile found</p>
+			<a href="{{pathFor 'stProfileUpdate'}}" class="btn btn-primary btn-xs">Update Profile</a>
+			{{/if}}
+		</div>
+	{{/with}}
+	{{else}}
+		{{>smsLoading}}
+	{{/if}}
+</template>
+
+<template name="stProfileUpdate">
+	<div class="col-md-offset-1 col-md-8">
+		{{#if Template.subscriptionsReady}}
+		<h2>Update your profile</h2><hr/>
+		{{> quickForm schema="g.Schemas.Student" id="stProfileUpdate" type="normal" doc=profile}}
+		{{else}}
+			{{>smsLoading}}
+		{{/if}}
+	</div>
+</template>
+
+<template name="stExams">
+	{{#if Template.subscriptionsReady}}
+	<div class="col-md-offset-1 col-md-10" id="stExams">
+		<h4>Available Exams</h4><hr/>
+		{{#if availableExams}}
+			<h4 class="text-info">Click "open" to view exam details.</h4>
+			<table class="table serial">
+				<tr>
+					<th>S/N</th>
+					<th>Subject</th>
+					<th>Questions/Minute</th>
+					<th>Session, term</th>
+					<th>Action</th>
+				</tr>
+				{{#each availableExams}}
+					<tr>
+						<td></td>
+						<td>{{subject}}</td>
+						<td>{{count}} questions, {{minute}} minutes</td>
+						<td>{{session}}, {{term}} term</td>
+						<td>
+							<a href="{{pathFor 'stViewExam'}}/{{_id}}" class="btn btn-danger btn-xs" title="View exam details"><span class="fa fa-info"></span> Open</a>
+						</td>
+					</tr>
+				{{/each}}
+			</table>
+		{{else}}
+		<h3 style="text-align:center">No examination is currently available.</h3>	
+		{{/if}}
+		<br/>
+		<h4>Completed Exams</h4><hr/>
+		{{#if completedExams}}
+			<table class="table serial">
+				<tr>
+					<th>S/N</th>
+					<th>Subject</th>
+					<th>Session, term</th>
+					<th>Action</th>
+				</tr>
+				{{#each completedExams}}
+					<tr>
+						<td></td>
+						<td>{{subject}} ({{questionsCount}} questions)</td>
+						<td>{{session}}, {{term}} term</td>
+						<td>
+							<a href="{{pathFor 'stResult'}}/{{_id}}" class="btn btn-info btn-xs" title="View exam details"><span class="fa fa-info"></span>	Result</a>
+						</td>
+					</tr>
+				{{/each}}
+			</table>
+		{{else}}
+		<h3 style="text-align:center">You've not completed any examination.</h3>	
+		{{/if}}
+	</div>
+	{{else}}
+		{{>smsLoading}}
+	{{/if}}
+
+</template>
+<template name="stViewExam">
+	{{#if Template.subscriptionsReady}}
+		<div id="stViewExam" class="col-md-11">
+			{{#with exam}}
+				<h3>{{subject}} Examinations Instructions</h3>
+				<hr/>
+				<p>Exam Name: {{subject}}<br/>
+					Class: {{class}} <br/>
+					Session/Term: Session {{session}}, {{term}} term<br/>
+					Number of Questions: {{count}} questions<br/>
+					Minutes: {{minute}} minutes <br/>
+				</p>
+				<p>
+					<strong>Instructions</strong><br/>
+					Click <b>"Start Now"</b> below to start the examination. <br/> <b>Please note these:</b>
+						<ul>
+							<li> You cannot pause the exam after starting.</li>	
+							<li> Do not navigate away from the questions page.</li>
+							<li><b>Submit your exam before the time ends else the system will submit for you. </b></li>	
+							<li><b>Good luck!</b></li>
+						</ul>
+				</p>
+				
+				<p class="col-md-offset-5">
+					<a href="{{pathFor 'stDoExam'}}/{{_id}}" class="btn btn-danger btn-lg" id="startExam" title="Start exam now">Start Now</a>
+				</p>
+
+			{{/with}}
+		</div>
+	{{else}}
+		{{>smsLoading}}
+	{{/if}}
+</template>
+<template name="stDoExam">
+	{{#if Template.subscriptionsReady}}
+		<div class="col-md-9" id="stDoExam">
+			{{#with exam}}
+			<h3><strong>Subject: {{subject}}</strong> || <strong>Class: {{class}}</strong> || <strong>{{count}} Questions</strong></h3><hr/>
+			<form id="questionsList">
+				{{#each questions}}
+				<div class="question" id="{{id}}">
+					<p><span>{{id}}</span>. {{question}}</p>
+					<span>A. <input type="radio" name="{{id}}" value="{{a}}"> {{a}}</span><br/>
+					<span>B. <input type="radio" name="{{id}}" value="{{b}}"> {{b}}</span><br/>
+					{{#if c}}
+						<span>C. <input type="radio" name="{{id}}" value="{{c}}"> {{c}}</span><br/>
+					{{/if}}
+					
+					{{#if d}}
+						<span>D. <input type="radio" name="{{id}}" value="{{d}}"> {{d}}</span>
+					{{/if}}
+				</div><hr/>
+				{{/each}}
+				<br/>
+				<button type="submit" class="btn btn-success btn-lg">Submit</button>
+			</form>
+			<div class="count">
+				<div class="timeCount" title="Time remaining">
+					<span class="text-danger"><b>Time left</b></span>
+					<h3 class="text-danger">{{timeOut}}{{minute}}:00</h3>
+				</div><hr/>
+				<div class="checkedCount" title="Answered/Total">
+					<span class="text-info"><b>Answered / Total</b></span>
+					<h3><span>0</span> / {{questionCount}}</h3>
+				</div><hr/>
+				<div class="questionLink">
+					<p><span class="text-info"><b>Questions Navigation</b></span></p>
+					{{#each questions}}
+					<a href="#{{id}}" class="" title="Question {{id}}">{{id}}</a>
+					{{/each}}
+				</div>
+			</div>
+			{{/with}}
+		</div>
+	{{else}}
+		{{> smsLoading}}
+	{{/if}}
+	
+</template>
+<template name="stResult">
+	{{#if Template.subscriptionsReady}}
+		<div class="col-md-9" id="stResult">
+			{{#with result}}
+				<h3><strong>Subject: {{subject}}</strong> || <strong>Class: {{class}}</strong> || <strong>{{questionCount}} Questions</strong></h3><hr/>
+
+				{{#each questions}}
+				<div class="question" id="{{id}}">
+					<p><span>{{id}}</span>. {{question}} {{#if unanswered}}<b class="text-danger"> Unanswered <span class="fa fa-times"></span></b>{{/if}}</p>
+					<span>A. {{{a}}}</span><br/>
+					<span>B. {{{b}}}</span><br/>
+					{{#if c}}
+						<span>C. {{{c}}}</span><br/>
+					{{/if}}
+					
+					{{#if d}}
+						<span>D. {{{d}}}</span><br/>
+					{{/if}}
+
+					<span><strong>Answer: {{answer}} </strong></span>
+					<hr/>
+				</div>
+				{{/each}}
+				<div class="count">
+					<span><b>Total Questions</b></span>
+					<h3>{{questionsCount}}</h3><hr/>
+					
+					<span><b>Total Answered</b></span>
+					<h3 class="text-info">{{answeredCount}}</h3><hr/>
+
+					<span><b>Correct Answers</b></span>
+					<h3 class="text-success">{{correctAnswer}}</h3><hr/>
+
+					<span><b>Unanswered</b></span>
+					<h3 class="text-danger">{{unanswered}}</h3>
+				</div>
+			{{/with}}
+		</div>
+	{{else}}
+		{{>smsLoading}}
+	{{/if}}
+	
+</template>
