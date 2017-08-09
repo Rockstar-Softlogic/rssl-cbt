@@ -232,17 +232,6 @@ Template.singleExam.helpers({
 	},
 });
 
-Template.singleExam.events({
-	'submit .gotoQuestion form':(e)=>{
-		e.preventDefault();
-		let questionNumber = e.target.questionNumber.value;
-		let origin = window.location.href.split("#")[0];
-			questionNumber = questionNumber<2?questionNumber:questionNumber-1;
-		window.location = origin+"#"+(questionNumber);
-		return;
-	}
-});
-
 Template.editExam.onCreated(function(){
 	let self = this;
 		self.autorun(function(){
