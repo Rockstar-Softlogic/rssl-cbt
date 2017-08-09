@@ -461,9 +461,8 @@ AutoForm.hooks({
 // **********************///
 
 function reEnableBtn(id){
-	return $(id+" button").attr("disabled",false);
+	return $(id+" button[type='submit']").attr("disabled",false);
 }
-
 function insertNotice(text, time = 4000){
 	$('.insertNotice').text(text);
 	$('.insertNotice').show('slow');

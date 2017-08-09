@@ -14,7 +14,6 @@ Meteor.methods({
 		}else{
 			throw new Meteor.Error(400, "Session and term handler is faulty, notify the administrator");
 		}
-
 		return ("Session "+session+" was created and term set to 1<sup>st</sup>.");	
 	},
 
@@ -99,9 +98,7 @@ Meteor.methods({
 				delete doc.id;
 			let update = Meteor.users.update({"_id":id},{$set:{"profile":doc}});
 			return update;
-		}
-			
-			
+		}		
 	},
 	newStaff:function(doc){
 		if(!this.userId || !Roles.userIsInRole(this.userId, ['staff'])){
@@ -145,7 +142,6 @@ function sentenceCase(name){
 		name.split(" ").forEach(function(n){
 			cased.push(n[0].toUpperCase() + n.substring(1).toLowerCase()); 
 		});
-
 		return cased.join(" ");
 	}
 	return name;
