@@ -1,7 +1,7 @@
 import './main.html';
-//import xlsx from 'xlsx';
+import xlsx from 'xlsx';
 
-XLSX = require('xlsx');
+///XLSX = require('xlsx');
 
 let monthArr = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
@@ -276,7 +276,7 @@ Template.uploadExam.events({
 		}
 		reader.onload = function(e){
 			let data = e.target.result;
-			let exam = XLSX.read(data,{type:'binary'});
+			let exam = xlsx.read(data,{type:'binary'});
 			let sheet = exam.Sheets.Sheet1;
 			let examPreview = excelToJSON(sheet);
 				excelToTable(examPreview);
