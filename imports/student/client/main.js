@@ -141,7 +141,6 @@ Template.stDoExam.helpers({
 Template.stDoExam.events({
 	'submit form#questionsList':function(e){
 		e.preventDefault();
-		showProcessing();
 		let answers = [];
 		let radio = document.querySelectorAll("input[type=radio]:checked");
 		for(let i = 0; i < radio.length; i++){
@@ -154,7 +153,6 @@ Template.stDoExam.events({
 		Meteor.call("markStAnswers",answers,this,function(error){
 			if(error){
 				insertNotice(error,6000);
-				showProcessing();
 				FlowRouter.go("stExams");
 				return;
 			}else{
@@ -270,12 +268,10 @@ AutoForm.hooks({
 	stProfileUpdate:{
 		onSubmit:function(doc){
 			this.event.preventDefault();
-			showProcessing();
 			Meteor.call("profileUpdate",doc,function(error){
 				if(error){
 					insertNotice(error, 6000);
 					reEnableBtn("#stProfileUpdate");
-					showProcessing();
 					return;
 				}else{
 					insertNotice("Profile update successful");
@@ -286,9 +282,6 @@ AutoForm.hooks({
 	},
 
 });
-function showProcessing(){
-	return $("#processRequest").toggle("slow");
-}
 
 function reEnableBtn(id){
 	return $(id+" button[type='submit']").attr("disabled",false);
