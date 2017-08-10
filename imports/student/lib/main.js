@@ -37,7 +37,11 @@ Meteor.methods({
 			
 			if(checkCount==0){
 				let insert = g.StAnswers.insert({"examId":co._id,
-											"studentId":this.userId,
+											"studentId":co.userId,
+											"subject":co.subject,
+											"class":co.class,
+											"session":co.session,
+											"term":co.term,
 											"questionsCount":co.questions.length,
 											"answeredCount":computeAnswer().length,
 											"unanswered":(co.questions.length-(computeAnswer().length)),
@@ -49,7 +53,12 @@ Meteor.methods({
 				}else{
 					let attempt = checkLength.attempt?attempt+1:1;
 					let update = g.StAnswers.update({"examId":co._id,
-											"studentId":this.userId},{$set:{"attempt":attempt,
+											"studentId":this.userId},{$set:{
+																			"subject":co.subject,
+																			"class":co.class,
+																			"session":co.session,
+																			"term":co.term,
+																			"attempt":attempt,
 																			"questionsCount":co.questions.length,
 																			"answeredCount":sa.length,
 																			"unanswered":(co.questions.length-sa.length),

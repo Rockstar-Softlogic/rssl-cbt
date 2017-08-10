@@ -37,7 +37,7 @@
 	{{#if Template.subscriptionsReady}}
 	{{#with user}}
 		<div class="col-md-offset-1 col-md-7">
-			<p><b>Email: {{emails.[0].address}}</b></p>
+			<p><b>Username: {{username}}</b></p>
 			{{#if profile}}
 				{{#with profile}}
 				<table class="table">
@@ -70,7 +70,6 @@
 						
 					</tfoot>
 				</table>
-		
 				{{/with}}
 			{{else}}
 			<p>No profile found</p>
@@ -274,4 +273,53 @@
 		{{>smsLoading}}
 	{{/if}}
 	
+</template>
+
+<template name="stSingleResult">
+	{{#if Template.subscriptionsReady}}
+		<div class="col-md-offset-1 col-md-10">
+			{{#with profile}}
+				<h3>{{lastName}}, {{firstName}} Result</h3><hr/>
+				<table class="table">
+					<tr>
+						<td>First Name</td><td>{{firstName}}</td>
+						<td>Last Name</td><td>{{lastName}}</td>
+					</tr>
+					
+					<tr>
+						<td>Current Class</td><td>{{currentClass}}</td>
+					{{#with setting}}
+						<td>Session / Term</td><td>{{session}}, {{term}}</td>
+					{{/with}}
+					</tr>
+					
+				</table>
+			{{/with}}		
+			{{#if result}}
+				<table class="table serial">
+					<tr>
+						<th></th>
+						<th>Subject</th>
+						<th>Score</th>
+						<th>Total questions</th>
+						<th>Remark</th>
+					</tr>
+				{{#each result}}
+					<tr>
+						<td></td>
+						<td>{{subject}}</td>
+						<td>{{score}}</td>
+						<td>{{questionsCount}}</td>
+						<td></td>
+					</tr>
+				{{/each}}
+				</table>
+			{{else}}
+				<h3>No result for this session and term</h3>
+			{{/if}}
+
+		</div>
+	{{else}}
+		{{>smsLoading}}
+	{{/if}}
 </template>

@@ -54,7 +54,7 @@ Template.stExams.helpers({
 			let filtered = papers.filter(function(exam){
 					let examResult = g.StAnswers.findOne({"examId":exam._id});
 						if(!examResult){
-							exam.term = termSuffix(exam.term);
+							exam.term = g.termSuffix(exam.term);
 							exam.count=exam.questions.length;
 							return exam;
 						}
@@ -70,7 +70,7 @@ Template.stExams.helpers({
 				let paper = g.Exams.findOne({"_id":exam.examId});
 					exam.subject=paper.subject;
 					exam.session=paper.session;
-					exam.term=termSuffix(paper.term);
+					exam.term=g.termSuffix(paper.term);
 					return exam;
 				});
 			return examResult;
@@ -89,7 +89,7 @@ Template.stViewExam.helpers({
 	exam:function(){
 		let id = FlowRouter.getParam("id");
 		let paper = g.Exams.findOne({"_id":id});
-			paper.term = termSuffix(paper.term);
+			paper.term = g.termSuffix(paper.term);
 			paper.count = paper.questions.length;
 		return paper;
 	}
@@ -99,7 +99,7 @@ Template.stViewExam.events({
 	'click #startExam':function(e){
 		/*Meteor.call("createStAnswer",this,function(error){
 			if(error){
-				insertNotice(error,6000);
+				g.notice(error,6000);
 				FlowRouter.go("stExams");
 				return;
 			}
@@ -121,7 +121,6 @@ Template.stDoExam.helpers({
 	exam:function(){
 		let id = FlowRouter.getParam("id");
 		let paper = g.Exams.findOne({"_id":id});
-			paper.term = termSuffix(paper.term);
 			paper.questionCount = paper.questions.length;
 			// Meteor.setTimeout(function(){
 			// 	$("form#questionsList").submit();
@@ -132,7 +131,7 @@ Template.stDoExam.helpers({
 	timeOut:function(){
 		let id = FlowRouter.getParam("id");
 		let minute = Number(g.Exams.findOne({"_id":id}).minute);
-		let counter = new CountDown(minute);
+		let counter = new g.CountDown(minute);
 			countBound = counter.countDownDiff.bind(counter);
 			countBound();
 	},
@@ -149,14 +148,13 @@ Template.stDoExam.events({
 				temp.selected = radio[i].value;
 			answers.push(temp);
 		}
-		console.log(this);
 		Meteor.call("markStAnswers",answers,this,function(error){
 			if(error){
-				insertNotice(error,6000);
+				g.notice(error,6000);
 				FlowRouter.go("stExams");
 				return;
 			}else{
-				insertNotice("Your Examination was submitted successfully. Good luck.");
+				g.notice("Your Examination was submitted successfully. Good luck.");
 				FlowRouter.go("stExams");
 			}
 		});
@@ -263,113 +261,57 @@ Template.stResult.helpers({
 	}
 });
 
+Template.stSingleResult.onCreated(function(){
+	let self = this;
+		self.autorun(function(){
+			self.subscribe('stAnswers');
+			self.subscribe('settings');
+		});
+});
+
+Template.stSingleResult.helpers({
+	result:function(){
+		let currentClass = Meteor.user().profile.currentClass,
+			setting = g.Settings.findOne({"_id":"default"});
+		let session = setting.session,
+			term = setting.term;
+		let exams = g.StAnswers.find({"session":session}).fetch();
+		if(exams){
+			exams.forEach(function(exam){
+				exam.term = g.termSuffix(exam.term);
+				exam.score = g.countCorrectAnswer(exam.answers);
+				return exam;
+			});
+			return exams;
+		}
+	},
+	profile:function(){
+		let pro = Meteor.user().profile;
+		if(pro){
+			return pro;
+		}
+	},
+	setting:function(){
+		let setting = g.Settings.findOne({"_id":"default"});
+			setting.term = g.termSuffix(setting.term);
+		return setting;
+	},
+});
+
+
 ////////////////////////autoform hooks///////////////////////////////////
 AutoForm.hooks({
 	stProfileUpdate:{
 		onSubmit:function(doc){
 			this.event.preventDefault();
-			Meteor.call("profileUpdate",doc,function(error){
-				if(error){
-					insertNotice(error, 6000);
-					reEnableBtn("#stProfileUpdate");
-					return;
-				}else{
-					insertNotice("Profile update successful");
-					FlowRouter.go("stProfile");
-				}
+			g.meteorCall("profileUpdate",{
+						doc:doc,
+						submitBtnId:"#stProfileUpdate",
+						successMsg:"Profile update successful",
+						redirect:"stProfile"	
 			});
 		}
 	},
 
 });
 
-function reEnableBtn(id){
-	return $(id+" button[type='submit']").attr("disabled",false);
-}
-
-function insertNotice(text, time = 4000){
-	$('.insertNotice').text(text);
-	$('.insertNotice').show('slow');
-	bootbox.alert(text)
-	setTimeout(function(){
-		$('.insertNotice').fadeOut(3000);
-			}, time);
-}
-
-function termSuffix(term){
-	switch(term){
-		case 1:
-			term="1st";
-			break;
-		case 2:
-			term="2nd";
-			break;
-		case 3:
-			term="3rd";
-	}
-	return term;
-}
-
-function counter(num){
-	if(num > 0){
-		num--;
-		console.log(num);
-	}else{
-		bootbox.alert("Time end!");
-		return Meteor.clearInterval()
-	}
-}
-
-function CountDown(minute){
-	this.now = new Date(),
-	this.totalMin = this.now.getMinutes()+minute,
-	this.seconds = this.now.getSeconds(),
-	this.endHours = Math.floor(this.totalMin/60),
-	this.endMinutes = this.totalMin - (this.endHours*60),
-	this.endTime = this.now.getHours()+this.endHours+":"+this.endMinutes,
-	this.hoursDiff = Math.floor(minute/60),
-	this.minutesDiff = minute - (this.hoursDiff*60),
-	this.timeDiff = this.hoursDiff+":"+this.minutesDiff,
-	this.countDownDiff = function(){
-			var sec = 0//this.seconds,
-				min = this.minutesDiff,
-				hr = this.hoursDiff,
-				trackSec = 0,
-				trackMin = 0,
-				trackHr = 0;
-		Meteor.setTimeout(function count(){
-			var loc = window.location.pathname.split("#")[0].split("/");
-			if(loc[loc.length-1].length==17&&loc[loc.length-2]=="do"){
-				if(sec < 0){
-					sec = 59;//reset seconds to 59
-					min--;
-				}
-				if(min < 0){
-					min = 59;//reset minutes to 59
-					hr--;
-				}
-				if(hr < 0){
-					hr = 23;//reset hour to 23
-				}
-				if(sec<10)sec="0"+sec; //a digit to 2 digits;
-				if(min<10)min="0"+Math.abs(min);
-				if(hr<10)hr="0"+Math.abs(hr);
-				$(".count .timeCount h3").text(hr+":"+min+":"+sec);
-				sec--;
-				if(sec==trackSec&&min==trackMin&&hr==trackHr){
-					new Audio(window.location.origin+"/times_up.mp3").play();
-					$("form#questionsList").submit();
-					$(".count .timeCount span").html("<b>Time's up!</b>");
-					Meteor.clearTimeout(count);
-					return;
-				}
-				if(min%5==0 && sec==00){
-					new Audio(window.location.origin+"/times_up.mp3").play();
-				}
-				Meteor.setTimeout(count,1000);
-			}else{
-					Meteor.clearTimeout(count);
-			}
-		}, 1000);
-	}
-}

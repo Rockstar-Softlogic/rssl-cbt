@@ -138,6 +138,18 @@ $topnav-bg: #df421e;
     padding: 5px 15px;
 }
 
+footer{
+    background-color:#abc;
+    a{
+        text-decoration: none;
+        color:#fff;
+        font-weight: bold;
+
+    }
+    a:hover{
+        text-decoration: none;
+    }
+}
 
 .insertNotice{
 	position: fixed;
