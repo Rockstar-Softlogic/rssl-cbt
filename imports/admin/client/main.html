@@ -94,8 +94,10 @@
 
 <template name="profileUpdate">
 	{{#if Template.subscriptionsReady}}
-	<h2>Update your profile</h2>
-	{{> quickForm schema="g.Schemas.Staff" id="profileUpdate" type="normal" doc=profile}}
+	<div class="col-md-offset-1 col-md-6"><hr/>
+		<h2>Update your profile</h2>
+		{{> quickForm schema="g.Schemas.Staff" id="profileUpdate" type="normal" doc=profile}}
+	</div>
 	{{else}}
 		{{>smsLoading}}
 	{{/if}}
@@ -105,7 +107,7 @@
 <template name="examsList">
 	{{#if Template.subscriptionsReady}}
 	<div class="col-md-12">
-		<h2>Examinations Listing</h2>
+		<h2>Examinations Listing</h2><hr/>
 		<a href="{{pathFor 'newExam'}}" class="btn btn-primary"><span class="fa fa-plus"></span> New Exam</a>
 		<a href="{{pathFor 'uploadExam'}}" class="btn btn-primary"><span class="fa fa-upload"></span> Upload Exam</a>
 		<hr/>
@@ -218,9 +220,6 @@
 		<div id="examPreview">
 			
 		</div>
-	</div>
-	<div class="processUpload" style="display:none;">
-		{{>smsLoading}}
 	</div>
 </template>
 

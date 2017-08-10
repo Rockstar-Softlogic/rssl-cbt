@@ -1,9 +1,5 @@
 import './main.html';
-//import xlsx from 'xlsx';
-
 XLSX = require('xlsx');
-
-let monthArr = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 Template.staffDashboard.onCreated(function(){
 	let self = this;
@@ -38,21 +34,16 @@ Template.staffDashboard.events({
 			session += (("/") + (++session)).toString();
 		bootbox.confirm("Create new session "+session+"? Term will be set to 1<sup>st</sup> on creation of new session.", function(result){
 			if(result){
-				Meteor.call('newSession',function(error,result){
-					if(error){
-						insertNotice(error, 6000);
-						return;
-					}else{
-						insertNotice(result);
-					}
-				});
+				g.meteorCall("newSession",{
+					successMsg:"Session created successfully."});
 			}else{
-
+				return false;
 			}
 		});
 	},
 	'click #newTerm': function(){
 		let currentTerm = g.Settings.findOne({_id:"default"}).term, term;
+		if(!currentTerm){g.notice("Create a session first.",6000);return;}
 			switch(currentTerm){
 				case 1:
 					term = "2nd";
@@ -69,14 +60,7 @@ Template.staffDashboard.events({
 		}else{
 			bootbox.confirm("Sure to create "+term+" term?", function(result){
 				if(result){
-					Meteor.call('newTerm',function(error,result){
-						if(error){
-							insertNotice(error, 6000);
-							return;
-						}else{
-							insertNotice(result);
-						}
-					});
+					g.meteorCall("newTerm",{successMsg:"Term created successfully."});
 				}
 			});
 		}
@@ -165,11 +149,7 @@ Template.editStaff.helpers({
 		}
 	}	
 });
-
-
-
-///end staff
-
+//end staff
 Template.examsList.onCreated(function(){
 	let self = this;
 		self.autorun(function(){
@@ -187,7 +167,7 @@ Template.examsList.helpers({
 		}
 		if(papers){
 			papers.forEach(function(exam){
-				exam.term = termSuffix(exam.term);
+				exam.term = g.termSuffix(exam.term);
 				exam.count=exam.questions.length;
 				return exam;
 
@@ -226,7 +206,7 @@ Template.singleExam.helpers({
 	exam:function(){
 		let id = FlowRouter.getParam("id");
 		let paper = g.Exams.findOne({_id:id});
-			paper.term = termSuffix(paper.term);
+			paper.term = g.termSuffix(paper.term);
 			paper.count=paper.questions.length;
 			return paper;
 	},
@@ -260,7 +240,7 @@ Template.uploadExam.events({
 		let reader = new FileReader();
 		let type = file.type.split(".");
 		if(allowedFormat.indexOf(type[type.length-1])<0){
-			insertNotice("Unsupported file selected", 6000);
+			g.notice("Unsupported file selected", 6000);
 			return;
 		}
 		reader.onload = function(e){
@@ -281,32 +261,22 @@ Template.uploadExam.events({
 		let minute =e.target.minute.value;
 		let getExam = Session.get("examToUpload");
 		if(!getExam){
-			insertNotice("Please select a valid file to upload.");
+			g.notice("Please select a valid file to upload.");
 			return;
 		}
 		else if(!examClass || !examSubject || !minute){
-			insertNotice("Please select a class, subject and time given for exam.");
+			g.notice("Please select a class, subject and time given for exam.");
 			return;
 		}else{
 			bootbox.confirm("Sure to upload this file?", function(result){
 				if(result){
-					$("div.processUpload").show("fast");
 					getExam.class = examClass;
 					getExam.subject = examSubject;
 					getExam.publish = publish;
 					getExam.minute = minute;
-					Meteor.call("newExam",getExam,function(error,result){
-						if(error){
-							$("div.processUpload").hide("fast");
-							insertNotice(error, 6000);
-							return;
-						}else{
-							$("div.processUpload").hide("fast");
-							insertNotice("Exam uploaded and added successfully");
-							FlowRouter.go("examsList");
-							return;
-						}
-					});
+					g.meteorCall("newExam",{doc:getExam,
+											successMsg:"Exam uploaded and added successfully",
+											redirect:"examsList"});
 				}
 			});
 			
@@ -323,31 +293,20 @@ AutoForm.hooks({
 	newExam:{
 		onSubmit:function(data){
 			this.event.preventDefault();
-			Meteor.call('newExam',data,function(error, result){
-				if(error){
-					insertNotice(error, 6000);
-					reEnableBtn("#newExam");
-					return;
-				}else{
-					insertNotice("Exam created successful");
-					FlowRouter.go('examsList');
-
-				}
-			});
+			g.meteorCall("newExam",{doc:data,
+									submitBtnId:"#newExam",
+									successMsg:"Exam created successful",
+									redirect:"examsList"});
 		}
 	},
 	profileUpdate:{
 		onSubmit:function(data){
 			this.event.preventDefault();
-			Meteor.call("profileUpdate",data,function(error){
-				if(error){
-					insertNotice(error, 6000);
-					return;
-				}else{
-					insertNotice("Profile update successful");
-					FlowRouter.go("profile");
-				}
-			});
+			g.meteorCall("profileUpdate",{doc:data,
+										submitBtnId:"#profileUpdate",
+										successMsg:"Profile update successful",
+										redirect:"profile"});
+
 		}
 	},
 	editExam:{
@@ -359,34 +318,31 @@ AutoForm.hooks({
 			Meteor.call('newExam',doc,function(error, result){
 				if(error){
 					$("div.processUpload").hide('fast');
-					insertNotice(error, 6000);
+					g.notice(error, 6000);
 					reEnableBtn("#editExam");
 					return;
 				}else{
 					console.log("received here too");
 
 					$("div.processUpload").hide('fast');
-					insertNotice("Exam updated successful");
+					g.notice("Exam updated successful");
 					FlowRouter.go('exams');
 
 				}
 			});
+			//g.meteorCall("profileUpdate",data,"#profileUpdate","Profile update successful","profile");
+
 		}
 	},
 	newStudent:{
 		onSubmit:function(doc){
 			this.event.preventDefault();
 			doc.type="insert";
-			Meteor.call('newStudent',doc,function(error){
-				if(error){
-					insertNotice(error, 6000);
-					reEnableBtn("#newStudent");
-					return;
-				}else{
-					insertNotice("Student added with success.");
-					FlowRouter.go("studentList");
-				}
-			})
+			g.meteorCall("newStudent",{doc:doc,
+										submitBtnId:"#newStudent",
+										successMsg:"Student added with success.",
+										redirect:"studentList"});
+
 		}
 	},
 	editStudent:{
@@ -394,33 +350,22 @@ AutoForm.hooks({
 			this.event.preventDefault();
 			let id = FlowRouter.getParam("id");
 			doc.id=id;
-			Meteor.call('newStudent',doc,function(error){
-				if(error){
-					insertNotice(error, 6000);
-					reEnableBtn("#editStudent");
-					return;
-				}else{
-					insertNotice("Student data updated",4000);
-					FlowRouter.go("studentList");
-					
-				}
-			});
+			g.meteorCall("newStudent",{doc:doc,
+										submitBtnId:"#editStudent",
+										successMsg:"Student data updated.",
+										redirect:"studentList"});
+
 		}
 	},
 	newStaff:{
 		onSubmit:function(doc){
 			this.event.preventDefault();
 			doc.type="insert";
-			Meteor.call('newStaff',doc,function(error){
-				if(error){
-					insertNotice(error, 6000);
-					reEnableBtn("#newStaff");
-					return;
-				}else{
-					insertNotice("Staff added with success.");
-					FlowRouter.go("staffList");
-				}
-			});
+			g.meteorCall("newStaff",{doc:doc,
+									submitBtnId:"#newStaff",
+									successMsg:"Staff added with success.",
+									redirect:"staffList"});
+
 		}
 	},
 	editStaff:{
@@ -428,17 +373,11 @@ AutoForm.hooks({
 			this.event.preventDefault();
 			let id = FlowRouter.getParam("id");
 			doc.id=id;
-			Meteor.call('newStaff',doc,function(error){
-				if(error){
-					insertNotice(error, 6000);
-					reEnableBtn("#editStaff");
-					return;
-				}else{
-					insertNotice("Staff data updated",4000);
-					FlowRouter.go("staffList");
-					
-				}
-			});
+			g.meteorCall("newStaff",{doc:doc,
+									submitBtnId:"#editStaff",
+									successMsg:"Staff data updated.",
+									redirect:"staffList"});
+
 		}
 	}
 });
@@ -448,38 +387,6 @@ AutoForm.hooks({
 // ******BREAK Break******//
 // **********************///
 // **********************///
-
-function reEnableBtn(id){
-	return $(id+" button[type='submit']").attr("disabled",false);
-}
-function insertNotice(text, time = 4000){
-	$('.insertNotice').text(text);
-	$('.insertNotice').show('slow');
-	bootbox.alert(text)
-	setTimeout(function(){
-		$('.insertNotice').fadeOut(3000);
-			}, time);
-}
-
-function isEmptyObject(obj){
-	for(var key in obj){
-		if(Object.prototype.hasOwnProperty.call(obj, key)){
-			return false;
-		}
-	}
-	return true;
-}
-
-function sentenceCase(name){
-	if(typeof(name) === "string"){
-		var cased = [];
-		name.split(" ").forEach(function(n){
-			cased.push(n[0].toUpperCase() + n.substring(1).toLowerCase()); 
-		});
-		return cased.join(" ");
-	}
-	return name;
-}
 
 function excelToJSON(sheet){
 	let rows = Number(sheet["!ref"].split("G")[1]);
@@ -527,16 +434,4 @@ function excelToTable(array){
 }
 
 
-function termSuffix(term){
-	switch(term){
-		case 1:
-			term="1st";
-			break;
-		case 2:
-			term="2nd";
-			break;
-		case 3:
-			term="3rd";
-	}
-	return term;
-}
+

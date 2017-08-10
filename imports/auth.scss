@@ -152,3 +152,21 @@ $topnav-bg: #df421e;
 	right: 0;
 	opacity: 0.8;
 }
+
+#smsLoading{
+    position:fixed;
+    width:100%;
+    min-height:100vh;
+    top:0%;
+    right:0%;
+    padding:10% 25%;
+    // padding:10% 50% 22% 45%;
+    z-index:9999;
+    text-align:center;
+    // background-color:orangered;
+    background-color:rgba(0,0,0,0.2);
+    div{
+        // border:1px solid black;
+        padding:4em;
+    }
+}
