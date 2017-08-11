@@ -235,8 +235,8 @@
 	{{#if Template.subscriptionsReady}}
 		<div class="col-md-9" id="stResult">
 			{{#with result}}
-				<h3><strong>Subject: {{subject}}</strong> || <strong>Class: {{class}}</strong> || <strong>{{questionCount}} Questions</strong></h3><hr/>
-
+				<h3><strong>Subject: {{subject}}</strong> || <strong>Class: {{class}}</strong> || <strong>{{questionsCount}} Questions</strong></h3><hr/>
+			{{#if questions}}
 				{{#each questions}}
 				<div class="question" id="{{id}}">
 					<p><span>{{id}}</span>. {{question}} {{#if unanswered}}<b class="text-danger"> Unanswered <span class="fa fa-times"></span></b>{{/if}}</p>
@@ -254,6 +254,9 @@
 					<hr/>
 				</div>
 				{{/each}}
+			{{else}}
+				<h3 class="text-center text-danger">You did not submit any answer for this examination. Contact your adminitrator.</h3>
+			{{/if}}
 				<div class="count">
 					<span><b>Total Questions</b></span>
 					<h3>{{questionsCount}}</h3><hr/>
@@ -298,7 +301,7 @@
 			{{#if result}}
 				<table class="table serial">
 					<tr>
-						<th></th>
+						<th>S/N</th>
 						<th>Subject</th>
 						<th>Score</th>
 						<th>Total questions</th>
@@ -314,6 +317,7 @@
 					</tr>
 				{{/each}}
 				</table>
+				<button class="btn btn-danger printBtn" onclick="window.print()">Print</button>
 			{{else}}
 				<h3>No result for this session and term</h3>
 			{{/if}}

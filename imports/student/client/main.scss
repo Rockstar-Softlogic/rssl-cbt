@@ -1,4 +1,13 @@
 //student view styles
+
+//hide printbtn on print page
+@media print{
+	.printBtn{
+		display: none;
+	}
+}
+
+
 #stViewExam{
 	font-size:110%;
 	line-height:25px;

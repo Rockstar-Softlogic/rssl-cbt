@@ -88,7 +88,7 @@ Template.stViewExam.onCreated(function(){
 
 Template.stViewExam.onRendered(function(){
 	let id = FlowRouter.getParam("id");
-		Meteor.call("checkAnswer",id,function(error){
+		Meteor.call("checkAnswer",id,function(error,result){
 			if(error){
 				FlowRouter.go("stExams");
 				return;
@@ -132,9 +132,16 @@ Template.stDoExam.onCreated(function(){
 Template.stDoExam.onRendered(function(){
 		let id = FlowRouter.getParam("id");
 		let examId = Session.get("examId");
-		if(examId!==id || !examId){
+		if(!examId || examId!==id){
 			FlowRouter.go("stExams");
 		}else{
+			Meteor.call("initAnswer",id,function(error){
+				if(error){
+					FlowRouter.go("stExams");
+				}else{
+					//$(".side-nav").fadeOut("slow");
+				}
+			});
 		}
 });
 
@@ -142,13 +149,15 @@ Template.stDoExam.helpers({
 	exam:function(){
 		let id = FlowRouter.getParam("id");
 		let paper = g.Exams.findOne({"_id":id});
+		if(paper){
 			paper.questionCount = paper.questions.length;
+			return paper;			
+		}
+
 			// Meteor.setTimeout(function(){
 			// 	$("form#questionsList").submit();
 			// },5000);
-			console.log(this);
 		
-		return paper;
 	},
 	timeOut:function(){
 		let id = FlowRouter.getParam("id");
@@ -160,6 +169,7 @@ Template.stDoExam.helpers({
 });
 
 Template.stDoExam.onDestroyed(function(){
+	//$(".side-nav").fadeIn("slow");
 	Session.set("examId", undefined);
 	delete Session.keys.examId;
 });
@@ -228,11 +238,13 @@ Template.stResult.helpers({
 					class:q.class,
 					subject:q.subject,
 					questionsCount:ans.questionsCount,
-					answeredCount:ans.answeredCount,
-					unanswered:ans.unanswered
+					answeredCount:ans.answeredCount || 0,
+					unanswered:ans.unanswered || 0,
+					correctAnswer: 0
 					},
 			correct=0;//correct answers
 		//merge questions and answers
+		if(!ans.answers){return qAns;}
 		for(let i = 0; i < ans.answers.length; i++){
 			if(ans.answers[i].mark=="correct")correct++;//increment correct
 			
@@ -305,7 +317,7 @@ Template.stSingleResult.helpers({
 		if(exams){
 			exams.forEach(function(exam){
 				exam.term = g.termSuffix(exam.term);
-				exam.score = g.countCorrectAnswer(exam.answers);
+				exam.score = exam.answers?g.countCorrectAnswer(exam.answers):"No answer submitted";
 				return exam;
 			});
 			return exams;
