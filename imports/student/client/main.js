@@ -82,6 +82,19 @@ Template.stViewExam.onCreated(function(){
 	let self = this;
 		self.autorun(function(){
 			self.subscribe('stExams');
+			self.subscribe('stAnswers');
+		});
+});
+
+Template.stViewExam.onRendered(function(){
+	let id = FlowRouter.getParam("id");
+		Meteor.call("checkAnswer",id,function(error){
+			if(error){
+				FlowRouter.go("stExams");
+				return;
+			}else{
+				Session.set("examId",id);
+			}
 		});
 });
 
@@ -89,9 +102,12 @@ Template.stViewExam.helpers({
 	exam:function(){
 		let id = FlowRouter.getParam("id");
 		let paper = g.Exams.findOne({"_id":id});
+		if(paper){
 			paper.term = g.termSuffix(paper.term);
 			paper.count = paper.questions.length;
-		return paper;
+			return paper;				
+		}
+
 	}
 });
 
@@ -114,7 +130,12 @@ Template.stDoExam.onCreated(function(){
 		});
 });
 Template.stDoExam.onRendered(function(){
-		
+		let id = FlowRouter.getParam("id");
+		let examId = Session.get("examId");
+		if(examId!==id || !examId){
+			FlowRouter.go("stExams");
+		}else{
+		}
 });
 
 Template.stDoExam.helpers({
@@ -125,6 +146,7 @@ Template.stDoExam.helpers({
 			// Meteor.setTimeout(function(){
 			// 	$("form#questionsList").submit();
 			// },5000);
+			console.log(this);
 		
 		return paper;
 	},
@@ -137,6 +159,10 @@ Template.stDoExam.helpers({
 	},
 });
 
+Template.stDoExam.onDestroyed(function(){
+	Session.set("examId", undefined);
+	delete Session.keys.examId;
+});
 Template.stDoExam.events({
 	'submit form#questionsList':function(e){
 		e.preventDefault();
@@ -312,6 +338,5 @@ AutoForm.hooks({
 			});
 		}
 	},
-
 });
 

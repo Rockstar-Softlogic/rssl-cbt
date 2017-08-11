@@ -3,27 +3,18 @@ Meteor.methods({
 		if(!this.userId || !Roles.userIsInRole(this.userId, ['student'])){
 			throw new Meteor.Error('500', 'Unauthorized Operation');
 		}
-		let checkCount = g.StAnswers.find({"examId":doc._id,
-										"studentId":this.userId}).count();
-		let checkLength = g.StAnswers.findOne({"examId":doc._id,
-										"studentId":this.userId});
-		if(checkCount==0){
-			let insert = g.StAnswers.insert({"examId":doc._id,
-										"studentId":this.userId,
-										"questionsCount":doc.questions.length});
-			return insert;
-		}else if(checkCount==1){
-			if(checkLength.questions){
-				throw new Meteor.Error("302", "You've already submitted this exam.");
-			}else{
-				let attempt = checkLength.attempt?attempt+1:1;
-				let update = g.StAnswers.update({"examId":doc._id,
-										"studentId":this.userId},{$set:{"attempt":attempt}});
-				return update;
-			}
-		}else{
-			throw new Meteor.Error("501", "You have multiple result for this exam already.");
+		
+	},
+	checkAnswer:function(id){
+		if(!this.userId || !Roles.userIsInRole(this.userId, ['student'])){
+			throw new Meteor.Error('500', 'Unauthorized Operation');
 		}
+		let check = g.StAnswers.findOne({"examId":id});
+		if(check){
+			throw new Meteor.Error("401", "Result for this exam is available.");
+		}
+		return true;
+		
 	},
 	markStAnswers:function(sa,co){
 		if(!this.userId || !Roles.userIsInRole(this.userId, ['student'])){

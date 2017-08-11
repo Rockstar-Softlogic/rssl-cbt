@@ -5,7 +5,7 @@ Meteor.publish({
 	'settings':function(){
 		let userId = this.userId;
 		if(Roles.userIsInRole(userId, ['staff', 'student'])){
-			let appSetting = g.Settings.find();	
+			let appSetting = g.Settings.find({"_id":"default"});	
 				if(appSetting){
 					return appSetting;
 				}
