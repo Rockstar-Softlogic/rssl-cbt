@@ -1,4 +1,18 @@
 Meteor.methods({
+	stProfileUpdate:function(doc){
+		if(!this.userId || !Roles.userIsInRole(this.userId, ['staff','student'])){
+			throw new Meteor.Error('500', 'Unauthorized Operation');
+		}
+		let userId = this.userId;
+		let update = Meteor.users.update({"_id":userId},{$set:{"profile.email":doc.email,
+																"profile.otherName":doc.otherName,
+																"profile.gender":doc.gender,
+																"profile.dob":doc.dob,
+																"profile.phone":doc.phone,
+																"profile.address":doc.address
+															}});
+		return update;
+	},
 	initAnswer:function(id){
 		if(!this.userId || !Roles.userIsInRole(this.userId, ['student'])){
 			throw new Meteor.Error('500', 'Unauthorized Operation');
@@ -7,6 +21,12 @@ Meteor.methods({
 			throw new Meteor.Error(302, "Invalid Parameter");
 		}
 		
+		let checkAnswer = g.StAnswers.findOne({"examId":id});
+		if(checkAnswer){
+			throw new Meteor.Error("401", "Your result for this exam is already available.");
+		}
+
+
 		let exam = g.Exams.findOne({"_id":id});	
 		let freshAnswer = g.StAnswers.insert({examId:id,
 											studentId:this.userId,

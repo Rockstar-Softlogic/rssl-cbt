@@ -11,15 +11,8 @@
 			</div>
 			<div class="col-md-5 sms-offset-1">
 				<h4 class="text-default">General Information</h4><hr/>
-				{{#if sessionInfo}}
-					{{#with sessionInfo}}
-						<h5>Current Session: {{session}}</h5>
-						<h5>Current Term: {{term}}</h5>
-					{{/with}}
-
-				{{else}}
-					<p class="text-info">School is currently not in session or term.</p>
-				{{/if}}	
+						<h5>Current Session: {{setting.session}}</h5>
+						<h5>Current Term: {{setting.termSuffix term}}</h5>
 			</div>
 			<div class="col-md-5 sms-offset-1">
 				
@@ -86,7 +79,7 @@
 	<div class="col-md-offset-1 col-md-8">
 		{{#if Template.subscriptionsReady}}
 		<h2>Update your profile</h2><hr/>
-		{{> quickForm schema="g.Schemas.Student" id="stProfileUpdate" type="normal" doc=profile}}
+		{{> quickForm schema="g.Schemas.StudentUpdate" id="stProfileUpdate" type="normal" doc=profile}}
 		{{else}}
 			{{>smsLoading}}
 		{{/if}}
@@ -95,7 +88,7 @@
 
 <template name="stExams">
 	{{#if Template.subscriptionsReady}}
-	<div class="col-md-offset-1 col-md-10" id="stExams">
+	<div class="col-md-offset-1 col-md-8" id="stExams">
 		<h4>Available Exams</h4><hr/>
 		{{#if availableExams}}
 			<h4 class="text-info">Click "open" to view exam details.</h4>
@@ -112,7 +105,7 @@
 						<td></td>
 						<td>{{subject}}</td>
 						<td>{{count}} questions, {{minute}} minutes</td>
-						<td>{{session}}, {{term}} term</td>
+						<td>{{session}}, {{termSuffix term}} term</td>
 						<td>
 							<a href="{{pathFor 'stViewExam'}}/{{_id}}" class="btn btn-danger btn-xs" title="View exam details"><span class="fa fa-info"></span> Open</a>
 						</td>
@@ -136,7 +129,7 @@
 					<tr>
 						<td></td>
 						<td>{{subject}} ({{questionsCount}} questions)</td>
-						<td>{{session}}, {{term}} term</td>
+						<td>{{session}}, {{termSuffix term}} term</td>
 						<td>
 							<a href="{{pathFor 'stResult'}}/{{_id}}" class="btn btn-info btn-xs" title="View exam details"><span class="fa fa-info"></span>	Result</a>
 						</td>
@@ -160,7 +153,7 @@
 				<hr/>
 				<p>Exam Name: {{subject}}<br/>
 					Class: {{class}} <br/>
-					Session/Term: Session {{session}}, {{term}} term<br/>
+					Session/Term: Session {{session}}, {{termSuffix term}} term<br/>
 					Number of Questions: {{count}} questions<br/>
 					Minutes: {{minute}} minutes <br/>
 				</p>
@@ -189,7 +182,7 @@
 	{{#if Template.subscriptionsReady}}
 		<div class="col-md-9" id="stDoExam">
 			{{#with exam}}
-			<h3><strong>Subject: {{subject}}</strong> || <strong>Class: {{class}}</strong> || <strong>{{count}} Questions</strong></h3><hr/>
+			<h3><strong>Subject: {{subject}}</strong> || <strong>Class: {{class}}</strong> || <strong>{{questionsCount}} Questions</strong></h3><hr/>
 			<form id="questionsList">
 				{{#each questions}}
 				<div class="question" id="{{id}}">
@@ -215,7 +208,7 @@
 				</div><hr/>
 				<div class="checkedCount" title="Answered/Total">
 					<span class="text-info"><b>Answered / Total</b></span>
-					<h3><span>0</span> / {{questionCount}}</h3>
+					<h3><span>0</span> / {{questionsCount}}</h3>
 				</div><hr/>
 				<div class="questionLink">
 					<p><span class="text-info"><b>Questions Navigation</b></span></p>
@@ -229,7 +222,13 @@
 	{{else}}
 		{{> smsLoading}}
 	{{/if}}
-	
+	<div class="examWarning" style="display:none;color:#fff;">
+		<h3 style="color:#fff;">
+			<p class="text-center"><u>Warning!!!</u></p><br/>
+			Do not navigate away from this page.
+			Answer the questions and submit.
+		</h3>
+	</div>
 </template>
 <template name="stResult">
 	{{#if Template.subscriptionsReady}}
@@ -292,7 +291,7 @@
 					<tr>
 						<td>Current Class</td><td>{{currentClass}}</td>
 					{{#with setting}}
-						<td>Session / Term</td><td>{{session}}, {{term}}</td>
+						<td>Session / Term</td><td>{{session}}, {{termSuffix term}}</td>
 					{{/with}}
 					</tr>
 					

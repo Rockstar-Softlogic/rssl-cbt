@@ -34,14 +34,25 @@ Meteor.publish({
 	},
 	'staffList':function(){
 		let userId = this.userId;
-		if(Roles.userIsInRole(userId, ['staff'])){
+		if(Roles.userIsInRole(userId, ['admin'])){
 			let staff = Meteor.users.find({"roles":"staff"});
 			if(staff){
 				return staff;
 			}
 		}
 		return this.ready();
+	},
+	'examAnswer':function(){
+		let userId = this.userId;
+		if(Roles.userIsInRole(userId, ['staff'])){
+			let answers = g.StAnswers.find({});
+			if(answers){
+				return answers;
+			}
+		}
+		return this.ready();
 	}
+	
 });
 
 Meteor.methods({

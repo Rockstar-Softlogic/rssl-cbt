@@ -9,14 +9,9 @@ Template.studentDashboard.onCreated(function(){
 });
 
 Template.studentDashboard.helpers({
-	sessionInfo:function(){
-		let settings = g.Settings.findOne();
-		if(settings){
-			return settings
-		}
-	},
 	count:function(){
-		let papers = g.Exams.find();
+		let setting = g.Settings.findOne({"_id":"default"});
+		let papers = g.Exams.find({"session":setting.session,"term":setting.term});
 		if(papers){
 			return papers.count();
 		}
@@ -43,20 +38,21 @@ Template.stExams.onCreated(function(){
 	let self = this;
 		self.autorun(function(){
 			self.subscribe('stExams');
-			self.subscribe('stAnswers')
+			self.subscribe('stAnswers');
+			self.subscribe('settings');
 		});
 });
 
 Template.stExams.helpers({
 	availableExams:function(){
-		let papers = g.Exams.find().fetch().reverse();
+		let setting = g.Settings.findOne({"_id":"default"});
+		let papers = g.Exams.find({"session":setting.session,"term":setting.term}).fetch().reverse();
 		if(papers){
 			let filtered = papers.filter(function(exam){
-					let examResult = g.StAnswers.findOne({"examId":exam._id});
+					let examResult = g.StAnswers.findOne({"examId":exam._id,"session":setting.session,"term":setting.term});
 						if(!examResult){
-							exam.term = g.termSuffix(exam.term);
 							exam.count=exam.questions.length;
-							return exam;
+							return true;
 						}
 						
 					});
@@ -64,15 +60,9 @@ Template.stExams.helpers({
 		}
 	},
 	completedExams:function(){
-		let examResult = g.StAnswers.find().fetch().reverse();
+		let setting = g.Settings.findOne({"_id":"default"});
+		let examResult = g.StAnswers.find({"session":setting.session,"term":setting.term}).fetch().reverse();
 		if(examResult){
-			examResult.forEach(function(exam){
-				let paper = g.Exams.findOne({"_id":exam.examId});
-					exam.subject=paper.subject;
-					exam.session=paper.session;
-					exam.term=g.termSuffix(paper.term);
-					return exam;
-				});
 			return examResult;
 		}
 	},
@@ -103,11 +93,9 @@ Template.stViewExam.helpers({
 		let id = FlowRouter.getParam("id");
 		let paper = g.Exams.findOne({"_id":id});
 		if(paper){
-			paper.term = g.termSuffix(paper.term);
 			paper.count = paper.questions.length;
 			return paper;				
 		}
-
 	}
 });
 
@@ -138,8 +126,6 @@ Template.stDoExam.onRendered(function(){
 			Meteor.call("initAnswer",id,function(error){
 				if(error){
 					FlowRouter.go("stExams");
-				}else{
-					//$(".side-nav").fadeOut("slow");
 				}
 			});
 		}
@@ -150,10 +136,9 @@ Template.stDoExam.helpers({
 		let id = FlowRouter.getParam("id");
 		let paper = g.Exams.findOne({"_id":id});
 		if(paper){
-			paper.questionCount = paper.questions.length;
+			paper.questionsCount = paper.questions.length;
 			return paper;			
 		}
-
 			// Meteor.setTimeout(function(){
 			// 	$("form#questionsList").submit();
 			// },5000);
@@ -169,7 +154,6 @@ Template.stDoExam.helpers({
 });
 
 Template.stDoExam.onDestroyed(function(){
-	//$(".side-nav").fadeIn("slow");
 	Session.set("examId", undefined);
 	delete Session.keys.examId;
 });
@@ -313,10 +297,9 @@ Template.stSingleResult.helpers({
 			setting = g.Settings.findOne({"_id":"default"});
 		let session = setting.session,
 			term = setting.term;
-		let exams = g.StAnswers.find({"session":session}).fetch();
+		let exams = g.StAnswers.find({"session":session,"term":term}).fetch();
 		if(exams){
 			exams.forEach(function(exam){
-				exam.term = g.termSuffix(exam.term);
 				exam.score = exam.answers?g.countCorrectAnswer(exam.answers):"No answer submitted";
 				return exam;
 			});
@@ -329,11 +312,6 @@ Template.stSingleResult.helpers({
 			return pro;
 		}
 	},
-	setting:function(){
-		let setting = g.Settings.findOne({"_id":"default"});
-			setting.term = g.termSuffix(setting.term);
-		return setting;
-	},
 });
 
 
@@ -342,7 +320,7 @@ AutoForm.hooks({
 	stProfileUpdate:{
 		onSubmit:function(doc){
 			this.event.preventDefault();
-			g.meteorCall("profileUpdate",{
+			g.meteorCall("stProfileUpdate",{
 						doc:doc,
 						submitBtnId:"#stProfileUpdate",
 						successMsg:"Profile update successful",

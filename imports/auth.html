@@ -56,6 +56,7 @@
                 <li><a href="{{pathFor 'examsList'}}"><i class="fa fa-list"></i> Exam list </a></li>
             </ul>
         </li>
+        {{#if isInRole 'admin'}}
         <li>
             <a href="#" data-toggle="collapse" data-target="#submenu-5"><i class="fa fa-fw fa-users"></i> STAFFS <i class="fa fa-fw fa-angle-down pull-right"></i></a>
             <ul id="submenu-5" class="collapse">
@@ -63,6 +64,7 @@
                 <li><a href="{{pathFor 'staffList'}}"><i class="fa fa-list"></i> Staff list </a></li>
             </ul>
         </li>
+        {{/if}}
 		<li>
             <a href="#" data-toggle="collapse" data-target="#submenu-6"><i class="fa fa-fw fa-users"></i> STUDENTS <i class="fa fa-fw fa-angle-down pull-right"></i></a>
             <ul id="submenu-6" class="collapse">
@@ -145,7 +147,7 @@
 	                {{/with}}
 	            </li>
 	        </ul>
-	        <div class="collapse navbar-collapse navbar-ex1-collapse">
+	        <div class="collapse navbar-collapse navbar-ex1-collapse" id="stSideBar">
 		            {{> stSideBar}}
 		     </div>
 		</nav>

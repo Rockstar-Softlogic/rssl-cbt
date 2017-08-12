@@ -17,15 +17,8 @@
 			</div>
 			<div class="col-md-5 sms-offset-1">
 				<h4 class="text-default">General Information</h4><hr/>
-				{{#if sessionInfo}}
-					{{#with sessionInfo}}
-						<h5>Current Session: {{session}}</h5>
-						<h5>Current Term: {{term}}</h5>
-					{{/with}}
-
-				{{else}}
-					<p class="text-warning">No session or term is currently set. Create new session below.</p>
-				{{/if}}	
+						<h5>Current Session: {{setting.session}}</h5>
+						<h5>Current Term: {{termSuffix setting.term}}</h5>	
 				<button id="newSession" class="btn btn-danger">New Session</button>
 				<button id="newTerm" class="btn btn-danger">New Term</button>
 
@@ -106,19 +99,17 @@
 
 <template name="examsList">
 	{{#if Template.subscriptionsReady}}
-	<div class="col-md-12">
+	<div class="col-md-offset-1 col-md-10">
 		<h2>Examinations Listing</h2><hr/>
-		<a href="{{pathFor 'newExam'}}" class="btn btn-primary"><span class="fa fa-plus"></span> New Exam</a>
-		<a href="{{pathFor 'uploadExam'}}" class="btn btn-primary"><span class="fa fa-upload"></span> Upload Exam</a>
+		<a href="{{pathFor 'newExam'}}" class="btn btn-primary btn-xs"><span class="fa fa-plus"></span> New Exam</a>
+		<a href="{{pathFor 'uploadExam'}}" class="btn btn-primary btn-xs"><span class="fa fa-upload"></span> Upload Exam</a>
 		<hr/>
 		<form>
 			<select name="examClass">
-				<option value="JSS1">JSS1</option>
-				<option value="JSS2">JSS2</option>
-				<option value="JSS3">JSS3</option>
-				<option value="SSS1">SSS1</option>
-				<option value="SSS2">SSS2</option>
-				<option value="SSS1">SSS3</option>
+				{{#each classes}}
+				<option value="{{this}}">{{this}}</option>
+				{{/each}}
+				
 			</select>
 			<select name="examSubject">
 				{{#each subjects}}
@@ -145,7 +136,7 @@
 						<td>{{subject}} ({{count}} questions)</td>
 						<td>{{class}}</td>
 						<td>{{#if publish}}Published{{else}}Not Published{{/if}}</td>
-						<td>{{session}}, {{term}}</td>
+						<td>{{session}}, {{termSuffix term}}</td>
 						<td>
 							<a href="{{pathFor 'singleExam'}}/{{_id}}" class="btn btn-info btn-xs"><span class="fa fa-info"></span> View</a>
 							<a href="{{pathFor 'editExam'}}/{{_id}}" class="btn btn-primary btn-xs"><span class="fa fa-pencil"></span> Edit</a>
@@ -198,12 +189,9 @@
 		<form>
 			<select name="examClass" required>
 				<option value="" disabled selected>Select Class</option>
-				<option value="JSS1">JSS1</option>
-				<option value="JSS2">JSS2</option>
-				<option value="JSS3">JSS3</option>
-				<option value="SSS1">SSS1</option>
-				<option value="SSS2">SSS2</option>
-				<option value="SSS1">SSS3</option>
+				{{#each classes}}
+				<option value="{{this}}">{{this}}</option>
+				{{/each}}
 			</select>
 			<select name="examSubject" required>
 				<option value="" disabled selected>Select Subject</option>
@@ -236,7 +224,7 @@
 					<tr>
 						<td>Subject: {{subject}} ({{count}} questions)</td>
 						<td>Time Given: {{minute}} minutes</td>
-						<td>Term: {{term}}</td>
+						<td>Term: {{termSuffix term}}</td>
 
 					</tr>
 				</table>
@@ -292,6 +280,17 @@
 	{{#if Template.subscriptionsReady}}
 		<div class="col-md-offset-1 col-md-10">
 			<h3>Students List <a href="{{pathFor 'newStudent'}}" class="btn btn-primary btn-xs"><span class="fa fa-plus"></span> Add Student</a></h3><hr/>
+			<form>
+				<input type="text" name="studentId" placeholder="Student Id">
+				<select name="class">
+					<option value="" disabled selected>Select Class</option>
+
+					{{#each classes}}
+					<option value="{{this}}">{{this}}</option>
+					{{/each}}
+				</select>
+				<button type="submit" class="btn btn-primary btn-xs">Filter Student</button>
+			</form>
 			{{#if students}}
 				<table class="serial table">
 					<tr>
@@ -307,7 +306,10 @@
 						<td>{{profile.lastName}}, {{profile.firstName}} {{profile.otherName}}</td>
 						<td>{{username}}</td>
 						<td>{{profile.currentClass}}</td>
-						<td><a href="{{pathFor 'editStudent'}}/{{_id}}" class="btn btn-primary btn-xs"><span class="fa fa-pencil"></span> Edit</a></td>
+						<td>
+							<a href="{{pathFor 'editStudent'}}/{{_id}}" class="btn btn-primary btn-xs"><span class="fa fa-pencil"></span> Edit</a>
+							<a href="{{pathFor 'studentResult'}}/{{_id}}" class="btn btn-info btn-xs"><span class="fa fa-info"></span> Results</a>
+						</td>
 					</tr>
 
 				{{/each}}
@@ -320,6 +322,58 @@
 			{{>smsLoading}}
 		{{/if}}
 </template>
+
+<template name="studentResult">
+	{{#if Template.subscriptionsReady}}
+		<div class="col-md-offset-1 col-md-10">
+			{{#with profile}}
+				<h3>{{lastName}}, {{firstName}} Result</h3><hr/>
+				<table class="table">
+					<tr>
+						<td>First Name</td><td>{{firstName}}</td>
+						<td>Last Name</td><td>{{lastName}}</td>
+					</tr>
+					
+					<tr>
+						<td>Current Class</td><td>{{currentClass}}</td>
+					{{#with setting}}
+						<td>Session / Term</td><td>{{session}}, {{termSuffix term}}</td>
+					{{/with}}
+					</tr>
+					
+				</table>
+			{{/with}}		
+			{{#if result}}
+				<table class="table serial">
+					<tr>
+						<th>S/N</th>
+						<th>Subject</th>
+						<th>Score</th>
+						<th>Total questions</th>
+						<th>Remark</th>
+					</tr>
+				{{#each result}}
+					<tr>
+						<td></td>
+						<td>{{subject}}</td>
+						<td>{{score}}</td>
+						<td>{{questionsCount}}</td>
+						<td></td>
+					</tr>
+				{{/each}}
+				</table>
+				<button class="btn btn-danger printBtn" onclick="window.print()">Print</button>
+			{{else}}
+				<h3>No result for this session and term</h3>
+			{{/if}}
+
+		</div>
+	{{else}}
+		{{>smsLoading}}
+	{{/if}}
+
+</template>
+
 <template name="newStudent">
 		<div class="col-md-offset-2 col-md-6">
 			<h3>New Student</h3><hr/>

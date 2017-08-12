@@ -45,7 +45,7 @@ Meteor.methods({
 			throw new Meteor.Error('500', 'Unauthorized Operation');
 		}
 		let userId = this.userId;
-		let update = Meteor.users.update({_id:userId},{$set:{"profile":doc}});
+		let update = Meteor.users.update({"_id":userId},{$set:{"profile":doc}});
 		return update;
 	},
 	newExam:function(doc){
@@ -101,7 +101,7 @@ Meteor.methods({
 		}		
 	},
 	newStaff:function(doc){
-		if(!this.userId || !Roles.userIsInRole(this.userId, ['staff'])){
+		if(!this.userId || !Roles.userIsInRole(this.userId, ['admin'])){
 			throw new Meteor.Error('500', 'Unauthorized Operation');
 		}
 		if(!doc.staffId || !doc.firstName || !doc.lastName){
@@ -124,25 +124,18 @@ Meteor.methods({
 			let update = Meteor.users.update({"_id":id},{$set:{"profile":doc}});
 			return update;
 		}//update
+	},
+	removeExam:function(doc){
+		if(!this.userId || !Roles.userIsInRole(this.userId, ['staff'])){
+			throw new Meteor.Error('500', 'Unauthorized Operation');
+		}
+		let remove = g.Exams.remove({"_id":doc._id,"class":doc.class,"subject":doc.subject,"session":doc.session,"term":doc.term});
+			if(remove){
+				g.StAnswers.remove({"examId":doc._id,"class":doc.class,"subject":doc.subject,"session":doc.session,"term":doc.term});
+			}else{
+				throw new Meteor.Error("501", "Unable to remove exam. Contact the administrator.");
+			}
+
 	}	
 			
 });
-
-function isEmptyObject(obj){
-	for(var key in obj){
-		if(Object.prototype.hasOwnProperty.call(obj, key)){
-			return false;
-		}
-	}
-	return true;
-}
-function sentenceCase(name){
-	if(typeof(name) === "string"){
-		var cased = [];
-		name.split(" ").forEach(function(n){
-			cased.push(n[0].toUpperCase() + n.substring(1).toLowerCase()); 
-		});
-		return cased.join(" ");
-	}
-	return name;
-}
