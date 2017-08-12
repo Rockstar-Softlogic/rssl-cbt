@@ -7,34 +7,36 @@ import '../imports/auth.js'; //Authenticated users client code
 
 //Template global helpers
 Template.registerHelper("g.Schemas", g.Schemas);
-Template.registerHelper("termSuffix",function(term){
-    switch(term){
-        case 1:
-            term="1st";
-            break;
-        case 2:
-            term="2nd";
-            break;
-        case 3:
-            term="3rd";
-    }
-    return term;
-});
-Template.registerHelper("classes",function(){
-    return g.classArray;
-});
-Template.registerHelper("subjects",function(){
-    return g.subjectArray;
-});
 
-Template.registerHelper("setting",function(){
-    let set = g.Settings.findOne({"_id":"default"});
-    if(set){
-        return set;
-    }else{
-        return {session:"Session not set",term:"Term not set"};
-    }
-});
+registerGlobalHelpers({
+    termSuffix:function(term){
+            switch(term){
+            case 1:
+                term="1st";
+                break;
+            case 2:
+                term="2nd";
+                break;
+            case 3:
+                term="3rd";
+            }
+        return term;
+    },
+    classes:function(){
+        return g.classArray;
+    },
+    subjects:function(){
+        return g.subjectArray;
+    },
+    setting:function(){
+     let set = g.Settings.findOne({"_id":"default"});
+        if(set){
+            return set;
+        }else{
+            return {session:"Session not set",term:"Term not set"};
+        }
+    },
+})
 //end global template helpers
 
 Template.login.events({
@@ -65,3 +67,25 @@ Template.login.events({
     	});
     }
 });
+
+//termsuffix
+g.termSuffix = function(term){
+    switch(term){
+        case 1:
+            term="1st";
+            break;
+        case 2:
+            term="2nd";
+            break;
+        case 3:
+            term="3rd";
+    }
+    return term;
+}
+
+function registerGlobalHelpers(helpers){
+  _.chain(helpers)
+   .keys()
+   .each((i)=>{Template.registerHelper(i, helpers[i])})
+   .value()
+  }

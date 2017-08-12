@@ -279,8 +279,23 @@ Template.studentResult.helpers({
 });
 
 
+Template.resultList.onCreated(function(){
+	let self = this;
+		self.autorun(function(){
+			self.subscribe('examAnswer');
+		});
+});
 
-
+Template.resultList.helpers({
+	results:function(){
+		let id = FlowRouter.getParam("id");
+		let result = g.StAnswers.find({"examId":id});
+		if(result){
+			console.log(result)
+			return result;
+		}
+	},
+});
 
 
 Template.uploadExam.events({

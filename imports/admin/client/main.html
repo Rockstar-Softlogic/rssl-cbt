@@ -99,7 +99,7 @@
 
 <template name="examsList">
 	{{#if Template.subscriptionsReady}}
-	<div class="col-md-offset-1 col-md-10">
+	<div class="col-md-10">
 		<h2>Examinations Listing</h2><hr/>
 		<a href="{{pathFor 'newExam'}}" class="btn btn-primary btn-xs"><span class="fa fa-plus"></span> New Exam</a>
 		<a href="{{pathFor 'uploadExam'}}" class="btn btn-primary btn-xs"><span class="fa fa-upload"></span> Upload Exam</a>
@@ -128,6 +128,7 @@
 						<th>Class</th>
 						<th>Status</th>
 						<th>Session, term</th>
+						<th>Result</th>
 						<th>Action</th>
 					</tr>
 					{{#each exams}}
@@ -137,6 +138,9 @@
 						<td>{{class}}</td>
 						<td>{{#if publish}}Published{{else}}Not Published{{/if}}</td>
 						<td>{{session}}, {{termSuffix term}}</td>
+						<td>
+							<a href="{{pathFor 'resultList'}}/{{_id}}" class="btn btn-primary btn-xs"><span class="fa fa-check"></span> Results list</a>
+						</td>
 						<td>
 							<a href="{{pathFor 'singleExam'}}/{{_id}}" class="btn btn-info btn-xs"><span class="fa fa-info"></span> View</a>
 							<a href="{{pathFor 'editExam'}}/{{_id}}" class="btn btn-primary btn-xs"><span class="fa fa-pencil"></span> Edit</a>
@@ -373,6 +377,43 @@
 	{{/if}}
 
 </template>
+
+<template name="resultList">
+	{{#if Template.subscriptionsReady}}
+	<div class="col-md-offset-1 col-md-10">
+	<h3>Results List</h3><hr/>
+		{{#if results}}
+			<table class="table serial">
+				<tr>
+					<th></th>
+					<th>Name</th>
+					<th>Correct Answer</th>
+					<th>Answered</th>
+					<th>Unanswered</th>
+					<th>Action</th>
+				</tr>
+			{{#each results}}
+				<tr>
+					<td></td>
+					<td>{{studentId}}</td>
+					<td>correct Answer</td>
+					<td>{{answeredCount}}</td>
+					<td>{{unanswered}}</td>
+					<td>
+						<button class="btn btn-danger btn-xs">Delete</button>
+					</td>
+				</tr>
+			{{/each}}
+			</table>
+		{{else}}
+			<h3 class="text-center text-info">No result for the examination queried yet.</h3>
+		{{/if}}
+	</div>
+	{{else}}
+		{{>smsLoading}}
+	{{/if}}
+</template>
+
 
 <template name="newStudent">
 		<div class="col-md-offset-2 col-md-6">

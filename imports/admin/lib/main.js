@@ -1,7 +1,7 @@
 
 Meteor.methods({
 	newSession: function(){
-		if(!this.userId || !Roles.userIsInRole(this.userId, ['staff'])){
+		if(!this.userId || !Roles.userIsInRole(this.userId, ['admin'])){
 			throw new Meteor.Error('500', 'Unauthorized Operation');
 		}
 		let session = new Date().getFullYear();
@@ -18,7 +18,7 @@ Meteor.methods({
 	},
 
 	newTerm: function(){
-		if(!this.userId || !Roles.userIsInRole(this.userId, ['staff'])){
+		if(!this.userId || !Roles.userIsInRole(this.userId, ['admin'])){
 			throw new Meteor.Error('500', 'Unauthorized Operation');
 		}
 		let term;
