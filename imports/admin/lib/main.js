@@ -49,7 +49,7 @@ Meteor.methods({
 		return update;
 	},
 	newExam:function(doc){
-		if(!this.userId || !Roles.userIsInRole(this.userId, ['staff'])){
+		if(!this.userId || !Roles.userIsInRole(this.userId, ['staff','admin'])){
 			throw new Meteor.Error('500', 'Unauthorized Operation');
 		}
 		let userId = this.userId, settings;
@@ -74,6 +74,21 @@ Meteor.methods({
 				return createPaper;
 			}	
 		}
+	},
+	editExam:function(doc){
+		if(!this.userId || !Roles.userIsInRole(this.userId, ['staff','admin'])){
+			throw new Meteor.Error('500', 'Unauthorized Operation');
+		}
+		let id = doc.target;
+			delete doc.target;
+		doc.answers=[];
+		for(var i=0; i<doc.questions.length; i++){
+			doc.questions[i].id=i+1;
+			let answerObj = {id:doc.questions[i].id,answer:doc.questions[i].answer};
+			doc.answers.push(answerObj);
+		}
+		let updatePaper = g.Exams.update({"_id":id},{$set:doc});
+		return updatePaper;
 	},
 	newStudent:function(doc){
 		if(!this.userId || !Roles.userIsInRole(this.userId, ['staff'])){
@@ -126,7 +141,7 @@ Meteor.methods({
 		}//update
 	},
 	removeExam:function(doc){
-		if(!this.userId || !Roles.userIsInRole(this.userId, ['staff'])){
+		if(!this.userId || !Roles.userIsInRole(this.userId, ['staff','admin'])){
 			throw new Meteor.Error('500', 'Unauthorized Operation');
 		}
 		let remove = g.Exams.remove({"_id":doc._id,"class":doc.class,"subject":doc.subject,"session":doc.session,"term":doc.term});
@@ -135,7 +150,30 @@ Meteor.methods({
 			}else{
 				throw new Meteor.Error("501", "Unable to remove exam. Contact the administrator.");
 			}
-
-	}	
+	},
+	removeUser:function(id){
+		if(this.userId && Roles.userIsInRole(this.userId, ['admin'])){	
+			let delUser = Meteor.users.remove({"_id":id});
+			if(delUser){
+				//if student delete student result
+				let delResult = g.StAnswers.remove({"studentId":id});
+				//if staff, delete exams by this staff
+				let delExam = g.Exams.remove({"createdBy":id});
+			}
+		}else if(this.userId && Roles.userIsInRole(this.userId, ['staff'])){
+			if(Roles.userIsInRole(id, ['student'])){
+				let delUser = Meteor.users.remove({"_id":id});
+				if(delUser){
+					//delete student result
+					let delResult = g.StAnswers.remove({"studentId":id});
+				}		
+			}else{
+				throw new Meteor.Error('500', 'Unauthorized Operation');
+			}
+		}else{
+			throw new Meteor.Error('500', 'Unauthorized Operation');
+		}
+		
+	},	
 			
 });

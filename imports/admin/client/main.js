@@ -11,14 +11,14 @@ Template.staffDashboard.onCreated(function(){
 
 Template.staffDashboard.helpers({
 	count:function(){
-		let total = g.Exams.find({});
+		let setting = g.Settings.findOne({"_id":"default"});
+		let total = g.Exams.find({"session":setting.session,"term":setting.term});
 		if(total){
 			total = total.count();
 			let publish = g.Exams.find({"publish":true}).count();
 			let unpublish = g.Exams.find({"publish":false}).count();
 			return {total:total,publish:publish,unpublish:unpublish};	
 		}
-		
 	}
 });
 
@@ -88,6 +88,20 @@ Template.studentList.events({
 		let stId = e.target.studentId.value,
 			currentClass = e.target.class.value;
 		Session.set("studentFilter",{stId:stId,class:currentClass});
+	},
+	"click #deleteStudent":function(e){
+		let self = this.profile;
+		let msg = "<h4><b>Deleting a student will also delete his/her results.</b><br/><br/>";
+			msg += "<b> <u>Details</u><br/> "+self.lastName+", "+self.firstName+" in "+self.currentClass+" </b></h4>";
+			msg += "<h3> Are you sure? This action cannot be undone!</h3>";
+		let target = this._id;
+		bootbox.confirm(msg,function(result){
+			if(result){
+				g.meteorCall("removeUser",{doc:target,
+										successMsg:"The student was removed!."
+										});
+			}
+		});
 	}
 });
 
@@ -105,7 +119,8 @@ Template.editStudent.helpers({
 		if(user){
 			return user;
 		}
-	}	
+	}
+	
 });
 ///Staff script
 Template.staffList.onCreated(function(){
@@ -121,6 +136,23 @@ Template.staffList.helpers({
 		if(users){
 			return users
 		}
+	}	
+});
+
+Template.staffList.events({
+	"click #deleteStaff":function(e){
+		let self = this;
+		let msg = "<h4><b>Deleting a staff will also delete his/her examinations.</b><br/><br/>";
+			msg += "<b> <u>Details</u><br/> "+self.profile.lastName+", "+self.profile.firstName+" with staff Id "+self.username+" </b></h4>";
+			msg += "<h3> Are you sure? This action cannot be undone!</h3>";
+		let target = this._id;
+		bootbox.confirm(msg,function(result){
+			if(result){
+				g.meteorCall("removeUser",{doc:target,
+										successMsg:"The staff was removed!."
+										});
+			}
+		});
 	}	
 });
 
@@ -146,16 +178,18 @@ Template.examsList.onCreated(function(){
 		self.autorun(function(){
 			self.subscribe("myExams");
 			self.subscribe("examAnswer");
+			self.subscribe("settings");
 		});
 });
 
 Template.examsList.helpers({
 	exams:function(){
+		let setting = g.Settings.findOne({"_id":"default"});
 		let filter = Session.get('examFilter'),papers;
 		if(filter){
-			filter=="showAllExams"?papers=g.Exams.find().fetch().reverse():papers=g.Exams.find({$or:[{"subject":filter.subject},{"class":filter.class},{"publish":filter.publish}]}).fetch().reverse();	
+			filter=="showAllExams"?papers=g.Exams.find({"session":setting.session,"term":setting.term}).fetch().reverse():papers=g.Exams.find({$or:[{"session":filter.session},{"term":filter.term}],$or:[{"subject":filter.subject},{"class":filter.class},{"publish":filter.publish}]}).fetch().reverse();	
 		}else{
-			papers=g.Exams.find().fetch().reverse();
+			papers=g.Exams.find({"session":setting.session,"term":setting.term}).fetch().reverse();
 		}
 		if(papers){
 			papers.forEach(function(exam){
@@ -174,10 +208,13 @@ Template.examsList.helpers({
 Template.examsList.events({
 	"submit form":function(event){
 		event.preventDefault();
-		let examClass=event.target.examClass.value;
-		let examSubject=event.target.examSubject.value;
-		let publish = event.target.publish.checked;
-		let examFilter = {subject:examSubject,class:examClass,publish:publish};
+		let examClass=event.target.examClass.value,
+			examSubject=event.target.examSubject.value,
+			publish = event.target.publish.checked,
+			session = event.target.session.value,
+			term = Number(event.target.term.value);
+
+		let examFilter = {subject:examSubject,class:examClass,publish:publish,session:session,term:term};
 		Session.set("examFilter",examFilter);
 	},
 	"click #showAllExams":function(e){
@@ -224,7 +261,7 @@ Template.editExam.onCreated(function(){
 Template.editExam.helpers({
 	exam:function(){
 		let id = FlowRouter.getParam("id");
-		let paper = g.Exams.findOne({_id:id});
+		let paper = g.Exams.findOne({_id:id},{fields:{"answers":0}});
 		return paper;
 	}
 });
@@ -377,26 +414,11 @@ AutoForm.hooks({
 	editExam:{
 		onSubmit:function(doc){
 			this.event.preventDefault();
-			console.log("received");
-			console.log(doc);
-			$("div.processUpload").show('slow');
-			Meteor.call('newExam',doc,function(error, result){
-				if(error){
-					$("div.processUpload").hide('fast');
-					g.notice(error, 6000);
-					reEnableBtn("#editExam");
-					return;
-				}else{
-					console.log("received here too");
-
-					$("div.processUpload").hide('fast');
-					g.notice("Exam updated successful");
-					FlowRouter.go('exams');
-
-				}
-			});
-			//g.meteorCall("profileUpdate",data,"#profileUpdate","Profile update successful","profile");
-
+			doc.target = this.currentDoc._id;
+			g.meteorCall("editExam",{doc:doc,
+									submitBtnId:"#editExam",
+									successMsg:"Exam updated successfully",
+									redirect:"examsList"});
 		}
 	},
 	newStudent:{

@@ -26,6 +26,13 @@ registerGlobalHelpers({
             }
         return term;
     },
+    termArray:function(){
+        return g.termArray;
+    },
+    sessionArray:function(){
+        let session = g.sessionArray();
+        return session;
+    },
     classes:function(){
         return g.classArray;
     },

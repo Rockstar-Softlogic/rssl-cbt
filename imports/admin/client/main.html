@@ -105,6 +105,18 @@
 		<a href="{{pathFor 'uploadExam'}}" class="btn btn-primary btn-xs"><span class="fa fa-upload"></span> Upload Exam</a>
 		<hr/>
 		<form>
+			<select name="session">
+				{{#each sessionArray}}
+				<option value="{{this}}">{{this}}</option>
+				{{/each}}
+			</select>
+			<select name="term">
+				<option value="" selected="" disabled="">Select term</option>
+
+				{{#each termArray}}
+				<option value="{{this}}">{{termSuffix this}}</option>
+				{{/each}}
+			</select>
 			<select name="examClass">
 				{{#each classes}}
 				<option value="{{this}}">{{this}}</option>
@@ -141,7 +153,7 @@
 						<td>
 							{{#if resultAvail}}<a href="{{pathFor 'resultList'}}/{{_id}}" class="btn btn-primary btn-xs" title="Click to view available results"><span class="fa fa-check"></span> Results list</a>
 							{{else}}
-								<span title="No answer submitted yet">Result empty</span>
+								<span title="No answer submitted yet">Empty</span>
 							{{/if}}
 						</td>
 						<td>
@@ -314,6 +326,7 @@
 						<td>
 							<a href="{{pathFor 'editStudent'}}/{{_id}}" class="btn btn-primary btn-xs"><span class="fa fa-pencil"></span> Edit</a>
 							<a href="{{pathFor 'studentResult'}}/{{_id}}" class="btn btn-info btn-xs"><span class="fa fa-info"></span> Results</a>
+							<button class="btn btn-danger btn-xs" id="deleteStudent"><span class="fa fa-trash"></span> Delete</button>
 						</td>
 					</tr>
 
@@ -392,7 +405,7 @@
 		{{#if results}}
 			<table class="table serial">
 				<tr>
-					<th></th>
+					<th>S/N</th>
 					<th>Name</th>
 					<th>Student Id</th>
 					<th>Correct Answer</th>
@@ -464,7 +477,7 @@
 
 <template name="staffList">
 	{{#if Template.subscriptionsReady}}
-		<div class="col-md-offset-1 col-md-10">
+		<div class="col-md-offset-1 col-md-8">
 			<h3>Staff List <a href="{{pathFor 'newStaff'}}" class="btn btn-primary btn-xs"><span class="fa fa-plus"></span> Add Staff</a></h3><hr/>
 			{{#if staffs}}
 				<table class="serial table">
@@ -479,7 +492,12 @@
 						<td></td>
 						<td>{{profile.lastName}}, {{profile.firstName}} {{profile.otherName}}</td>
 						<td>{{username}}</td>
-						<td><a href="{{pathFor 'editStaff'}}/{{_id}}" class="btn btn-primary btn-xs"><span class="fa fa-pencil"></span> Edit</a></td>
+						<td>
+							<a href="{{pathFor 'editStaff'}}/{{_id}}" class="btn btn-primary btn-xs"><span class="fa fa-pencil"></span> Edit</a>
+							<button class="btn btn-danger btn-xs" id="deleteStaff"><span class="fa fa-trash"></span> Delete</button>
+						</td>
+						
+
 					</tr>
 
 				{{/each}}

@@ -13,14 +13,15 @@ Meteor.publish({
 		return this.ready();
 	},
 	'myExams':function(){
-		let userId = this.userId;
-		if(Roles.userIsInRole(userId, ['staff'])){
-			let exams = g.Exams.find({createdBy:userId});
-			if(exams){
-				return exams;
-			}
+		let userId = this.userId,exams
+		if(Roles.userIsInRole(userId, ['staff','admin'])){
+			exams = g.Exams.find({createdBy:userId});
+		}else{
+			return this.ready();
 		}
-		return this.ready();
+		if(exams){
+			return exams;
+		}
 	},
 	'studentList':function(){
 		let userId = this.userId;
