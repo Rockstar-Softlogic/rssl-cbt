@@ -37,7 +37,7 @@
 
 <template name="profile">
 	{{#if Template.subscriptionsReady}}
-	{{#with user}}
+	{{#with loggedInUser}}
 		<div class="col-md-7">
 			<p><b>Email: {{emails.[0].address}}</b></p>
 			{{#if profile}}
@@ -89,7 +89,7 @@
 	{{#if Template.subscriptionsReady}}
 	<div class="col-md-offset-1 col-md-6"><hr/>
 		<h2>Update your profile</h2>
-		{{> quickForm schema="g.Schemas.Staff" id="profileUpdate" type="normal" doc=profile}}
+		{{> quickForm schema="g.Schemas.Staff" id="profileUpdate" type="normal" doc=loggedInUser.profile}}
 	</div>
 	{{else}}
 		{{>smsLoading}}
@@ -139,7 +139,10 @@
 						<td>{{#if publish}}Published{{else}}Not Published{{/if}}</td>
 						<td>{{session}}, {{termSuffix term}}</td>
 						<td>
-							<a href="{{pathFor 'resultList'}}/{{_id}}" class="btn btn-primary btn-xs"><span class="fa fa-check"></span> Results list</a>
+							{{#if resultAvail}}<a href="{{pathFor 'resultList'}}/{{_id}}" class="btn btn-primary btn-xs" title="Click to view available results"><span class="fa fa-check"></span> Results list</a>
+							{{else}}
+								<span title="No answer submitted yet">Result empty</span>
+							{{/if}}
 						</td>
 						<td>
 							<a href="{{pathFor 'singleExam'}}/{{_id}}" class="btn btn-info btn-xs"><span class="fa fa-info"></span> View</a>
@@ -287,8 +290,6 @@
 			<form>
 				<input type="text" name="studentId" placeholder="Student Id">
 				<select name="class">
-					<option value="" disabled selected>Select Class</option>
-
 					{{#each classes}}
 					<option value="{{this}}">{{this}}</option>
 					{{/each}}
@@ -381,12 +382,19 @@
 <template name="resultList">
 	{{#if Template.subscriptionsReady}}
 	<div class="col-md-offset-1 col-md-10">
-	<h3>Results List</h3><hr/>
+	<h3>Results List</h3>
+	<h4>
+	{{#with resultInfo}}
+		Class: {{class}} || Subject: {{subject}} || Session: {{session}}, {{termSuffix term}} term || {{questionsCount}} questions
+	{{/with}}
+	</h4>
+	<hr/>
 		{{#if results}}
 			<table class="table serial">
 				<tr>
 					<th></th>
 					<th>Name</th>
+					<th>Student Id</th>
 					<th>Correct Answer</th>
 					<th>Answered</th>
 					<th>Unanswered</th>
@@ -395,16 +403,25 @@
 			{{#each results}}
 				<tr>
 					<td></td>
+					{{#with profile}}
+					<td>{{lastName}}, {{firstName}} {{otherName}}</td>
 					<td>{{studentId}}</td>
-					<td>correct Answer</td>
+					{{/with}}
+					{{#if answeredCount}}
+					<td>{{correctAnswers}}</td>
 					<td>{{answeredCount}}</td>
 					<td>{{unanswered}}</td>
+					{{else}}
+					<td colspan="3" class="text-center text-info">No answer was submitted</td>
+					{{/if}}
 					<td>
 						<button class="btn btn-danger btn-xs">Delete</button>
 					</td>
 				</tr>
 			{{/each}}
-			</table>
+			</table><br/>
+			<button class="btn btn-danger printBtn" onclick="window.print()">Print</button>
+
 		{{else}}
 			<h3 class="text-center text-info">No result for the examination queried yet.</h3>
 		{{/if}}

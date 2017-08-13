@@ -16,25 +16,23 @@
 	            <a class="navbar-brand" href="/dashboard">
 	                <img src="/logo.jpg" alt="School Logo" style="max-width: 50px;">
 	            </a>
-	            <h4 style="color:#fff;display:inline;">
-	            	CBT Application
-	            </h4>
 	        </div>
+	         <h3 style="color:#fff;display:inline-block;margin:4px;">
+	            	Computer Based Test Application
+	          </h3>
 	         <!-- Top Menu Items -->
 	        <ul class="nav navbar-right top-nav">
 	            <li><a href="#" data-placement="bottom" data-toggle="tooltip" title="Messages"><i class="fa fa-envelope"></i>
 	                </a>
 	            </li>          
 	            <li class="dropdown">
-					{{#with user}}
-	                <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{username}} &nbsp;&nbsp;<b class="fa fa-ellipsis-v"></b></a>
+	                <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{loggedInUser.username}} &nbsp;&nbsp;<b class="fa fa-ellipsis-v"></b></a>
 	                <ul class="dropdown-menu">
 	                    <li><a href="{{pathFor 'profile'}}"><i class="fa fa-fw fa-user"></i>Profile</a></li>
 	                    <li><a href="#"><i class="fa fa-fw fa-cog"></i> Change Password</a></li>
 	                    <li class="divider"></li>
 	                    <li><a href="#" id="header-logout" title="Sign out"><i class="fa fa-fw fa-power-off"></i> Logout</a></li>
 	                </ul>
-	                {{/with}}
 	            </li>
 	        </ul>
 	        <div class="collapse navbar-collapse navbar-ex1-collapse">
@@ -69,14 +67,8 @@
             <a href="#" data-toggle="collapse" data-target="#submenu-6"><i class="fa fa-fw fa-users"></i> STUDENTS <i class="fa fa-fw fa-angle-down pull-right"></i></a>
             <ul id="submenu-6" class="collapse">
                 <li><a href="{{pathFor 'newStudent'}}"><i class="fa fa-user-plus"></i> Add new </a></li>
-                <li><a href="{{pathFor 'uploadStudent'}}"><i class="fa fa-upload"></i> Upload new </a></li>
+               <!--  <li><a href="{{pathFor 'uploadStudent'}}"><i class="fa fa-upload"></i> Upload new </a></li> -->
                 <li><a href="{{pathFor 'studentList'}}"><i class="fa fa-list"></i> Student list </a></li>
-            </ul>
-        </li>
-         <li>
-            <a href="#" data-toggle="collapse" data-target="#submenu-7"><i class="fa fa-fw fa-check-square"></i> RESULTS <i class="fa fa-fw fa-angle-down pull-right"></i></a>
-            <ul id="submenu-7" class="collapse">
-                <li><a href="/result"><i class="fa fa-list"></i> Result list </a></li>
             </ul>
         </li>
         <li>
@@ -124,12 +116,12 @@
 	                <span class="icon-bar"></span>
 	                <span class="icon-bar"></span>
 	            </button>
-	            <a class="navbar-brand" href="{{pathFor 'studentDashboard'}}">
+	            <a class="navbar-brand" href="{{pathFor 'studentDashboard'}}" style="padding:10px;">
 	                <img src="/logo.jpg" alt="School Logo" style="max-width: 50px;">
 	            </a>
-	            <h4 style="color:#fff;display:inline;">
-	            	CBT Application
-	            </h4>
+	          	<h3 style="color:#fff;display:inline-block;margin:4px;">
+	            	Computer Based Test Application
+	          	</h3>
 	        </div>
 	         <!-- Top Menu Items -->
 	        <ul class="nav navbar-right top-nav">
@@ -137,14 +129,12 @@
 	                </a>
 	            </li>          
 	            <li class="dropdown">
-					{{#with user}}
-	                <a href="#" class="dropdown-toggle" data-toggle="dropdown"> {{username}} &nbsp;&nbsp;<b class="fa fa-ellipsis-v"></b></a>
+	                <a href="#" class="dropdown-toggle" data-toggle="dropdown"> {{loggedInUser.username}} &nbsp;&nbsp;<b class="fa fa-ellipsis-v"></b></a>
 	                <ul class="dropdown-menu">
 	                    <li><a href="{{pathFor 'stProfile'}}"><i class="fa fa-fw fa-user"></i>Profile</a></li>
 	                    <li class="divider"></li>
 	                    <li><a href="#" id="header-logout" title="Sign out"><i class="fa fa-fw fa-power-off"></i> Logout</a></li>
 	                </ul>
-	                {{/with}}
 	            </li>
 	        </ul>
 	        <div class="collapse navbar-collapse navbar-ex1-collapse" id="stSideBar">
@@ -163,9 +153,6 @@
         </li>
         <li>
             <a href="{{pathFor 'stSingleResult'}}"><i class="fa fa-fw fa-check-square"></i> RESULTS</a>
-        </li>
-        <li>
-            <a href="#"><i class="fa fa-fw fa-comment"></i> FEEDBACK</a>
         </li>
     </ul>
 </template>

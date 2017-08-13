@@ -20,13 +20,10 @@ Meteor.methods({
 		if(id.length !== 17 || typeof id !=="string"){
 			throw new Meteor.Error(302, "Invalid Parameter");
 		}
-		
-		let checkAnswer = g.StAnswers.findOne({"examId":id});
+		let checkAnswer = g.StAnswers.findOne({"examId":id,"studentId":this.userId});
 		if(checkAnswer){
 			throw new Meteor.Error("401", "Your result for this exam is already available.");
 		}
-
-
 		let exam = g.Exams.findOne({"_id":id});	
 		let freshAnswer = g.StAnswers.insert({examId:id,
 											studentId:this.userId,
@@ -43,7 +40,7 @@ Meteor.methods({
 		if(!this.userId || !Roles.userIsInRole(this.userId, ['student'])){
 			throw new Meteor.Error('500', 'Unauthorized Operation');
 		}
-		let checkAnswer = g.StAnswers.findOne({"examId":id});
+		let checkAnswer = g.StAnswers.findOne({"examId":id,"studentId":this.userId});
 		if(checkAnswer){
 			throw new Meteor.Error("401", "Your result for this exam is already available.");
 		}

@@ -18,21 +18,6 @@ Template.studentDashboard.helpers({
 	}
 });
 
-Template.stProfile.helpers({
-	user: function(){
-        let currentUser = Meteor.user();
-        return currentUser;
-    },
-});
-
-Template.stProfileUpdate.helpers({
-	profile:function(){
-		let pro = Meteor.user().profile;
-		if(pro){
-			return pro;
-		}
-	},
-});
 
 Template.stExams.onCreated(function(){
 	let self = this;
@@ -122,9 +107,12 @@ Template.stDoExam.onRendered(function(){
 		let examId = Session.get("examId");
 		if(!examId || examId!==id){
 			FlowRouter.go("stExams");
+			console.log("throw is in session");
 		}else{
 			Meteor.call("initAnswer",id,function(error){
 				if(error){
+			console.log("throw is in meteor call");
+
 					FlowRouter.go("stExams");
 				}
 			});
@@ -304,12 +292,6 @@ Template.stSingleResult.helpers({
 				return exam;
 			});
 			return exams;
-		}
-	},
-	profile:function(){
-		let pro = Meteor.user().profile;
-		if(pro){
-			return pro;
 		}
 	},
 });

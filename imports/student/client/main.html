@@ -28,7 +28,7 @@
 
 <template name="stProfile">
 	{{#if Template.subscriptionsReady}}
-	{{#with user}}
+	{{#with loggedInUser}}
 		<div class="col-md-offset-1 col-md-7">
 			<p><b>Username: {{username}}</b></p>
 			{{#if profile}}
@@ -79,7 +79,7 @@
 	<div class="col-md-offset-1 col-md-8">
 		{{#if Template.subscriptionsReady}}
 		<h2>Update your profile</h2><hr/>
-		{{> quickForm schema="g.Schemas.StudentUpdate" id="stProfileUpdate" type="normal" doc=profile}}
+		{{> quickForm schema="g.Schemas.StudentUpdate" id="stProfileUpdate" type="normal" doc=loggedInUser.profile}}
 		{{else}}
 			{{>smsLoading}}
 		{{/if}}
@@ -280,7 +280,7 @@
 <template name="stSingleResult">
 	{{#if Template.subscriptionsReady}}
 		<div class="col-md-offset-1 col-md-10">
-			{{#with profile}}
+			{{#with loggedInUser.profile}}
 				<h3>{{lastName}}, {{firstName}} Result</h3><hr/>
 				<table class="table">
 					<tr>

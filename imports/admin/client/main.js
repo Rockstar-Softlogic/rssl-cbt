@@ -30,8 +30,6 @@ Template.staffDashboard.events({
 			if(result){
 				g.meteorCall("newSession",{
 					successMsg:"Session created successfully."});
-			}else{
-				return false;
 			}
 		});
 	},
@@ -62,21 +60,6 @@ Template.staffDashboard.events({
 
 });
 
-Template.profile.helpers({
-	user: function(){
-        let currentUser = Meteor.user();
-        return currentUser;
-    },
-});
-
-Template.profileUpdate.helpers({
-	profile:function(){
-		let pro = Meteor.user().profile;
-		if(pro){
-			return pro;
-		}
-	},
-});
 
 Template.studentList.onCreated(function(){
 	let self = this;
@@ -162,6 +145,7 @@ Template.examsList.onCreated(function(){
 	let self = this;
 		self.autorun(function(){
 			self.subscribe("myExams");
+			self.subscribe("examAnswer");
 		});
 });
 
@@ -175,6 +159,7 @@ Template.examsList.helpers({
 		}
 		if(papers){
 			papers.forEach(function(exam){
+				g.StAnswers.find({"examId":exam._id}).count()>0?exam.resultAvail=true:exam.resultAvail=false;
 				exam.count=exam.questions.length;
 				return exam;
 
@@ -283,18 +268,31 @@ Template.resultList.onCreated(function(){
 	let self = this;
 		self.autorun(function(){
 			self.subscribe('examAnswer');
+			self.subscribe('studentList');
 		});
 });
 
 Template.resultList.helpers({
 	results:function(){
 		let id = FlowRouter.getParam("id");
-		let result = g.StAnswers.find({"examId":id});
+		let result = g.StAnswers.find({"examId":id}).fetch();
 		if(result){
-			console.log(result)
+			result.forEach(function(res){
+				let st = Meteor.users.findOne({"_id":res.studentId});
+					res.profile = st.profile;
+					res.answers?res.correctAnswers=g.countCorrectAnswer(res.answers):false;
+				return res;
+			});
 			return result;
 		}
 	},
+	resultInfo:function(){
+		let id = FlowRouter.getParam("id");
+		let result = g.StAnswers.findOne({"examId":id},{fields:{"class":1,"subject":1,"session":1,"term":1,"questionsCount":1}});
+		if(result){
+			return result;
+		}
+	}
 });
 
 
