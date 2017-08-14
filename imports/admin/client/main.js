@@ -6,11 +6,12 @@ Template.staffDashboard.onCreated(function(){
 		self.autorun(function(){
 			self.subscribe('settings');
 			self.subscribe('myExams');
+			self.subscribe('studentList');
 		});
 });
 
 Template.staffDashboard.helpers({
-	count:function(){
+	examCount:function(){
 		let setting = g.Settings.findOne({"_id":"default"});
 		let total = g.Exams.find({"createdBy":Meteor.userId(),"session":setting.session,"term":setting.term});
 		if(total){
@@ -19,7 +20,18 @@ Template.staffDashboard.helpers({
 			let unpublish = g.Exams.find({"createdBy":Meteor.userId(),"publish":false}).count();
 			return {total:total,publish:publish,unpublish:unpublish};	
 		}
+	},
+	studentCount:function(){
+		let allStudent = Meteor.users.find({"_id":{$ne:Meteor.userId()},"profile.currentClass":{$ne:"Graduated"}}).count(),
+			jss1 = Meteor.users.find({"_id":{$ne:Meteor.userId()},"profile.currentClass":"JSS1"}).count(),
+			jss2 = Meteor.users.find({"_id":{$ne:Meteor.userId()},"profile.currentClass":"JSS2"}).count(),
+			jss3 = Meteor.users.find({"_id":{$ne:Meteor.userId()},"profile.currentClass":"JSS3"}).count(),
+			sss1 = Meteor.users.find({"_id":{$ne:Meteor.userId()},"profile.currentClass":"SSS1"}).count(),
+			sss2 = Meteor.users.find({"_id":{$ne:Meteor.userId()},"profile.currentClass":"SSS2"}).count(),
+			sss3 = Meteor.users.find({"_id":{$ne:Meteor.userId()},"profile.currentClass":"SSS3"}).count();
+		return {allStudent:allStudent,jss1:jss1,jss2:jss2,jss3:jss3,sss1:sss1,sss2:sss2,sss3:sss3};
 	}
+
 });
 
 Template.staffDashboard.events({
@@ -56,7 +68,22 @@ Template.staffDashboard.events({
 				}
 			});
 		}
-	}, 
+	},
+	'click #promoteStudents':function(e){
+		e.preventDefault();
+		let text = "<h4>Are you sure to promote all the students in the school?<br/>";
+			text += "JSS1 => JSS2 <br/> JSS2 => JSS3 <br/> JSS3 => SSS1 <br/>";
+			text += "SSS1 => SSS2 <br/> SSS2 => SSS3 <br/> SSS3 => Graduated </h4>";
+			bootbox.confirm(text,function(result){
+				if(result){
+					g.meteorCall("promoteStudents",{
+						doc:true,
+						successMsg:"All students have been promoted!"
+					});
+				}
+			});
+	}
+
 
 });
 
@@ -399,6 +426,22 @@ Template.resultList.helpers({
 		if(result){
 			return result;
 		}
+	}
+});
+
+Template.resultList.events({
+	'click #removeResult':function(e){
+		e.preventDefault();
+		let self = this;
+		let msg = "<h4>Remove "+self.profile.lastName+" "+self.profile.firstName+" "+self.subject+" Result?</h4>";
+			msg += "<h4> This cannot be undone.</h4>";
+		bootbox.confirm(msg,function(result){
+			if(result){
+				g.meteorCall("removeResult",{doc:self,
+											successMsg:"Student result has been removed."});
+			}
+		});
+
 	}
 });
 

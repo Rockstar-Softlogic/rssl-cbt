@@ -98,6 +98,7 @@ Meteor.methods({
 			throw new Meteor.Error('400', 'One of required field(s) is missing');
 		}
 		if(doc.type=="insert"){
+			delete doc.type;
 			let newSt = Accounts.createUser({
 						username:doc.studentId,
 						password:"12345",
@@ -174,6 +175,30 @@ Meteor.methods({
 			throw new Meteor.Error('500', 'Unauthorized Operation');
 		}
 		
-	},	
+	},
+	removeResult:function(doc){
+		if(!this.userId || !Roles.userIsInRole(this.userId, ['staff','admin'])){
+			throw new Meteor.Error('500', 'Unauthorized Operation');
+		}
+		let removeRes = g.StAnswers.remove({"_id":doc._id,"subject":doc.subject,"class":doc.class,"session":doc.session,"term":doc.term});
+		if(removeRes){
+			return removeRes;
+		}
+	},
+	promoteStudents:function(bool){
+		if(!this.userId || !Roles.userIsInRole(this.userId, ['admin'])){
+			throw new Meteor.Error('500', 'Unauthorized Operation');
+		}
+		if(!bool){throw new Meteor.Error('500',"Unable to validate.")}
+			let students = Meteor.users.find({"roles":"student","profile.currentClass":{$ne:"Graduated"}});
+			if(students){
+				let promote = students.map(function(st){
+								let newClass = g.promoteStudents(st.profile.currentClass);
+								Meteor.users.update({"_id":st._id},{$set:{"profile.currentClass":newClass}});
+								return newClass;
+							});
+				return true;
+			}	
+	}	
 			
 });

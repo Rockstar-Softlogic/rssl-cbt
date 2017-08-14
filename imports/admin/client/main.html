@@ -3,8 +3,8 @@
 		<div class="row" id="staffDashboard">
 			<div class="col-md-5 sms-offset-1">
 			<h4 class="text-default">Examinations</h4><hr/>
-				{{#if count}}
-					{{#with count}}
+				{{#if examCount}}
+					{{#with examCount}}
 						<h5><a href="{{pathFor 'examsList'}}">Total Exams: <span class="badge">{{total}}</span></a></h5>
 						<h5>Published Exams: <span class="badge">{{publish}}</span>, Unpublish Exams: <span class="badge">{{unpublish}}</span></h5>
 					{{/with}}
@@ -24,11 +24,29 @@
 
 			</div>
 			<div class="col-md-5 sms-offset-1">
-				
+				{{#with studentCount}}
+					<h4 class="text-default">Student Summary</h4><hr/>
+					<article style="float:left;padding-left:20px;">
+						<b>All Students: {{allStudent}}</b><br/>
+						<b>JSS1: {{jss1}}</b><br/>
+						<b>JSS2: {{jss2}}</b><br/>
+						<b>JSS3: {{jss3}}</b><br/>
+						<b>SSS1: {{sss1}}</b><br/>
+						<b>SSS2: {{sss2}}</b><br/>
+						<b>SSS3: {{sss3}}</b>	
+					</article>
+					<article style="float:right;padding-right:20px;">
+						<button class="btn btn-danger btn-lg" id="promoteStudents" title="Click to promote all students"> Promote Students</button>
+					</article>
+					<article style="clear:both;"></article>
+					
+				{{/with}}
+					
 			</div>
 			<div class="col-md-5 sms-offset-1">
 				
 			</div>
+
 		</div>
 	{{else}}
 		{{>smsLoading}}
@@ -428,7 +446,7 @@
 					<td colspan="3" class="text-center text-info">No answer was submitted</td>
 					{{/if}}
 					<td>
-						<button class="btn btn-danger btn-xs">Delete</button>
+						<button class="btn btn-danger btn-xs" id="removeResult">Delete</button>
 					</td>
 				</tr>
 			{{/each}}
