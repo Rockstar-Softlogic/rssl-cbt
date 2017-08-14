@@ -12,11 +12,11 @@ Template.staffDashboard.onCreated(function(){
 Template.staffDashboard.helpers({
 	count:function(){
 		let setting = g.Settings.findOne({"_id":"default"});
-		let total = g.Exams.find({"session":setting.session,"term":setting.term});
+		let total = g.Exams.find({"createdBy":Meteor.userId(),"session":setting.session,"term":setting.term});
 		if(total){
 			total = total.count();
-			let publish = g.Exams.find({"publish":true}).count();
-			let unpublish = g.Exams.find({"publish":false}).count();
+			let publish = g.Exams.find({"createdBy":Meteor.userId(),"publish":true}).count();
+			let unpublish = g.Exams.find({"createdBy":Meteor.userId(),"publish":false}).count();
 			return {total:total,publish:publish,unpublish:unpublish};	
 		}
 	}
@@ -89,6 +89,7 @@ Template.studentList.events({
 			currentClass = e.target.class.value;
 		Session.set("studentFilter",{stId:stId,class:currentClass});
 	},
+
 	"click #deleteStudent":function(e){
 		let self = this.profile;
 		let msg = "<h4><b>Deleting a student will also delete his/her results.</b><br/><br/>";
@@ -122,7 +123,7 @@ Template.editStudent.helpers({
 	}
 	
 });
-///Staff script
+///Staff script ...////
 Template.staffList.onCreated(function(){
 	let self = this;
 		self.autorun(function(){
@@ -172,6 +173,75 @@ Template.editStaff.helpers({
 		}
 	}	
 });
+
+Template.singleStaffExam.onCreated(function(){
+	let self = this;
+		self.autorun(function(){
+			self.subscribe("myExams");
+			self.subscribe("staffList");
+			self.subscribe("examAnswer");
+			self.subscribe("settings");
+		});
+});
+
+Template.singleStaffExam.helpers({
+	exams:function(){
+		let id = FlowRouter.getParam('id'),staffExam;
+		let setting = g.Settings.findOne({"_id":"default"});
+		let filter = Session.get('singleStaffExamFilter');
+		if(filter){
+			filter=="showAllExams"?staffExam=g.Exams.find({"createdBy":id,"session":setting.session,"term":setting.term}).fetch().reverse():staffExam=g.Exams.find({"createdBy":id,$or:[{"session":filter.session},{"term":filter.term}],$or:[{"subject":filter.subject},{"class":filter.class}]}).fetch().reverse();	
+		}else{
+			staffExam = g.Exams.find({'createdBy':id,"session":setting.session,"term":setting.term}).fetch().reverse();
+		}
+		
+		if(staffExam){
+			staffExam.forEach(function(exam){
+				g.StAnswers.find({"examId":exam._id}).count()>0?exam.resultAvail=true:exam.resultAvail=false;
+				exam.count=exam.questions.length;
+				return exam;
+
+			});
+			return staffExam;	
+		}
+	},
+	staffInfo:function(){
+		let id = FlowRouter.getParam('id');
+		return Meteor.users.findOne({"_id":id});
+	}
+
+});
+
+Template.singleStaffExam.events({
+	"submit form":function(e){
+		e.preventDefault();
+		let examClass=event.target.examClass.value,
+			examSubject=event.target.examSubject.value,
+			session = event.target.session.value,
+			term = Number(event.target.term.value);
+
+		let examFilter = {subject:examSubject,class:examClass,session:session,term:term};
+		Session.set("singleStaffExamFilter",examFilter);
+	},
+	"click #showAllExams":function(e){
+		e.preventDefault();
+		Session.set('singleStaffExamFilter',"showAllExams");
+	},
+	"click #removeExam":function(e){
+		e.preventDefault();
+		let warning = "<b>Are you sure? <br/>You're about to delete "+this.subject+" examination for "+this.class+" this will also delete all the submitted answers. This cannot be undone.</b>";
+		let self = this;
+		bootbox.confirm(warning,function(result){
+			if(result){
+				g.meteorCall("removeExam",{doc:self,
+											successMsg:"Exam has been removed!",
+											});
+			}
+		});
+
+	}
+});		
+
 //end staff
 Template.examsList.onCreated(function(){
 	let self = this;
@@ -187,9 +257,9 @@ Template.examsList.helpers({
 		let setting = g.Settings.findOne({"_id":"default"});
 		let filter = Session.get('examFilter'),papers;
 		if(filter){
-			filter=="showAllExams"?papers=g.Exams.find({"session":setting.session,"term":setting.term}).fetch().reverse():papers=g.Exams.find({$or:[{"session":filter.session},{"term":filter.term}],$or:[{"subject":filter.subject},{"class":filter.class},{"publish":filter.publish}]}).fetch().reverse();	
+			filter=="showAllExams"?papers=g.Exams.find({"createdBy":Meteor.userId(),"session":setting.session,"term":setting.term}).fetch().reverse():papers=g.Exams.find({"createdBy":Meteor.userId(),$or:[{"session":filter.session},{"term":filter.term}],$or:[{"subject":filter.subject},{"class":filter.class},{"publish":filter.publish}]}).fetch().reverse();	
 		}else{
-			papers=g.Exams.find({"session":setting.session,"term":setting.term}).fetch().reverse();
+			papers=g.Exams.find({"createdBy":Meteor.userId(),"session":setting.session,"term":setting.term}).fetch().reverse();
 		}
 		if(papers){
 			papers.forEach(function(exam){

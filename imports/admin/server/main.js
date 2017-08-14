@@ -14,9 +14,12 @@ Meteor.publish({
 	},
 	'myExams':function(){
 		let userId = this.userId,exams
-		if(Roles.userIsInRole(userId, ['staff','admin'])){
+		if(Roles.userIsInRole(userId, ['admin'])){
+			exams = g.Exams.find();
+		}else if(Roles.userIsInRole(userId, ['staff'])){
 			exams = g.Exams.find({createdBy:userId});
-		}else{
+		}
+		else{
 			return this.ready();
 		}
 		if(exams){

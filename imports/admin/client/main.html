@@ -100,7 +100,7 @@
 <template name="examsList">
 	{{#if Template.subscriptionsReady}}
 	<div class="col-md-10">
-		<h2>Examinations Listing</h2><hr/>
+		<h2>My Examinations Listing</h2><hr/>
 		<a href="{{pathFor 'newExam'}}" class="btn btn-primary btn-xs"><span class="fa fa-plus"></span> New Exam</a>
 		<a href="{{pathFor 'uploadExam'}}" class="btn btn-primary btn-xs"><span class="fa fa-upload"></span> Upload Exam</a>
 		<hr/>
@@ -494,6 +494,7 @@
 						<td>{{username}}</td>
 						<td>
 							<a href="{{pathFor 'editStaff'}}/{{_id}}" class="btn btn-primary btn-xs"><span class="fa fa-pencil"></span> Edit</a>
+							<a href="{{pathFor 'singleStaffExam'}}/{{_id}}" class="btn btn-primary btn-xs"><span class="fa fa-list"></span> View Exams</a>
 							<button class="btn btn-danger btn-xs" id="deleteStaff"><span class="fa fa-trash"></span> Delete</button>
 						</td>
 						
@@ -522,17 +523,86 @@
 	{{#if Template.subscriptionsReady}}
 		<div class="col-md-offset-1 col-md-6">
 			<h3>Update Staff Data</h3><hr/>
-		
 			{{> quickForm schema="g.Schemas.Staff" id="editStaff" type="normal" validation='blur' doc=staff}}
 		</div>
-		{{else}}
-			{{>smsLoading}}
-		{{/if}}
+	{{else}}
+		{{>smsLoading}}
+	{{/if}}
 </template>
 
+<template name="singleStaffExam">
+	{{#if Template.subscriptionsReady}}
+		<div class="col-md-offset-1 col-md-10">
+		<h2>Staff Exams List</h2>
+		{{#with staffInfo}}<h3>Quetions by {{profile.lastName}} {{profile.firstName}} ({{username}})</h3> {{/with}}
+		<hr/>
+		<form>
+			<select name="session">
+				{{#each sessionArray}}
+				<option value="{{this}}">{{this}}</option>
+				{{/each}}
+			</select>
+			<select name="term">
+				<option value="" selected="" disabled="">Select term</option>
+				{{#each termArray}}
+				<option value="{{this}}">{{termSuffix this}}</option>
+				{{/each}}
+			</select>
+			<select name="examClass">
+				{{#each classes}}
+				<option value="{{this}}">{{this}}</option>
+				{{/each}}
+			</select>
+			<select name="examSubject">
+				{{#each subjects}}
+				<option value="{{this}}">{{this}}</option>
+				{{/each}}
+			</select>			
+			<button type="submit" class="btn btn-primary btn-xs">Filter Exams</button>
+			<button type="button" id="showAllExams" class="btn btn-primary btn-xs">Show all Exams</button>
+		</form>
+		{{#if exams}}
+				<table class="table serial">
+					<tr>
+						<th>S/N</th>
+						<th>Subject</th>
+						<th>Class</th>
+						<th>Status</th>
+						<th>Session, term</th>
+						<th>Result</th>
+						<th>Action</th>
+					</tr>
+					{{#each exams}}
+					<tr>
+						<td></td>
+						<td>{{subject}} ({{count}} questions)</td>
+						<td>{{class}}</td>
+						<td>{{#if publish}}Published{{else}}Not Published{{/if}}</td>
+						<td>{{session}}, {{termSuffix term}}</td>
+						<td>
+							{{#if resultAvail}}<a href="{{pathFor 'resultList'}}/{{_id}}" class="btn btn-primary btn-xs" title="Click to view available results"><span class="fa fa-check"></span> Results list</a>
+							{{else}}
+								<span title="No answer submitted yet">Empty</span>
+							{{/if}}
+						</td>
+						<td>
+							<a href="{{pathFor 'singleExam'}}/{{_id}}" class="btn btn-info btn-xs"><span class="fa fa-info"></span> View</a>
+							<a href="{{pathFor 'editExam'}}/{{_id}}" class="btn btn-primary btn-xs"><span class="fa fa-pencil"></span> Edit</a>
+							<button class="btn btn-danger btn-xs" id="removeExam"><span class="fa fa-trash"></span> Remove</button>
 
+						</td>
+					</tr>
+					{{/each}}
+				</table>
+		{{else}}
+		<h3>No exam found!</h3>	
+		{{/if}}
 
-
+	</div>
+	{{else}}
+		{{>smsLoading}}
+	{{/if}}
+</template>
 
 
 
