@@ -40,10 +40,12 @@ function fakeAdmin(){
 fakeAdmin();
 
 Meteor.methods({
-	sendFeedback:function(doc){
-		check([doc.email,doc.subject,doc.message],[String]);
-		let to = 'hakym2009@gmail.com';
-		let obj = {to:to,from:doc.email,subject:doc.subject,text:doc.message};
-		Email.send(obj);
-	}
+
+	//later use....suspended!
+	// sendFeedback:function(doc){
+	// 	check([doc.email,doc.subject,doc.message],[String]);
+	// 	let to = 'hakym2009@gmail.com';
+	// 	let obj = {to:to,from:doc.email,subject:doc.subject,text:doc.message};
+	// 	Email.send(obj);
+	// }
 })

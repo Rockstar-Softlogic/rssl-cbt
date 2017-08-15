@@ -104,14 +104,6 @@ Template.feedback.events({
 
             }
         });
-        // Meteor.call("sendFeedback",mailObject,function(err,result){
-        //     if(err){
-        //         bootbox.alert(err);
-        //     }else{
-        //         bootbox.alert("Message was sent. Thank you!");
-        //         FlowRouter.go("/");
-        //     }
-        // })     
     }
 });
 // function registerGlobalHelpers(helpers){
