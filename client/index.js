@@ -78,7 +78,7 @@ Template.feedback.events({
         e.preventDefault();
         let subject = e.target.subject.value,
             message = e.target.message.value,
-            email = e.target.email?e.target.email.value:Meteor.user().emails[0].address;
+            email = e.target.email?e.target.email.value:Meteor.user().username;
         
             if((subject.length < 5 || subject.length > 100) || message.length < 50 || !email){
                 bootbox.alert("<h4>Error in message or subject </h4>");

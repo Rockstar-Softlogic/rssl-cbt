@@ -125,7 +125,7 @@
 					 <br style="clear:both">
 						<label>Email</label>
 						{{#if currentUser}}
-							<p><strong>{{loggedInUser.emails.[0].address}}</strong></p>
+							<p><strong>{{loggedInUser.username}}</strong></p>
 						{{else}}
 						<div class="form-group">
 							<input type="email" class="form-control" id="email" name="email" placeholder="Email" minlength="5" required><br/>
