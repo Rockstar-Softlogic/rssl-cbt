@@ -81,14 +81,29 @@ Template.feedback.events({
             email = e.target.email?e.target.email.value:Meteor.user().emails[0].address;
         console.log(subject, message, email);
         let mailObject = {email:email,subject:subject,message:message};
-        Meteor.call("sendFeedback",mailObject,function(err,result){
-            if(err){
-                bootbox.alert(err);
-            }else{
-                bootbox.alert("Message was sent. Thank you!");
-                FlowRouter.go("/");
+        $.ajax({
+            url:"https://formspree.io/wisdomabioye@gmail.com",
+            method: "POST",
+            data: mailObject,
+            dataType: "json",
+            success:function(data){
+                console.log("data incoming...");
+                console.log(data);
+            },
+            error:function(data, error){
+                console.log("data and error");
+                console.log(data, error);
+
             }
-        })     
+        });
+        // Meteor.call("sendFeedback",mailObject,function(err,result){
+        //     if(err){
+        //         bootbox.alert(err);
+        //     }else{
+        //         bootbox.alert("Message was sent. Thank you!");
+        //         FlowRouter.go("/");
+        //     }
+        // })     
     }
 });
 // function registerGlobalHelpers(helpers){
