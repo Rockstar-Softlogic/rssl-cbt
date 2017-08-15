@@ -79,20 +79,28 @@ Template.feedback.events({
         let subject = e.target.subject.value,
             message = e.target.message.value,
             email = e.target.email?e.target.email.value:Meteor.user().emails[0].address;
-        console.log(subject, message, email);
+        
+            if((subject.length < 5 || subject.length > 100) || message.length < 50 || !email){
+                bootbox.alert("<h4>Error in message or subject </h4>");
+                return;
+            }
         let mailObject = {email:email,subject:subject,message:message};
+        $("div.processRequest").show("fast");
         $.ajax({
             url:"https://formspree.io/wisdomabioye@gmail.com",
             method: "POST",
             data: mailObject,
             dataType: "json",
             success:function(data){
-                console.log("data incoming...");
-                console.log(data);
+                if(data.success){
+                    $("div.processRequest").hide("fast");
+                    bootbox.alert("<h4>Message sent. Thank you!</h4>");
+                    FlowRouter.go("/");
+                }
             },
             error:function(data, error){
-                console.log("data and error");
-                console.log(data, error);
+                $("div.processRequest").hide("fast");
+                bootbox.alert("<h4>Error occurred! Please try again!</h4>");
 
             }
         });

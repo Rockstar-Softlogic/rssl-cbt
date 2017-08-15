@@ -118,8 +118,8 @@
 </template>
 
 <template name="feedback">
-	<div class="col-md-5 col-md-offset-4">
-				<h3 style="margin-bottom: 25px; text-align: center;">Feedback Form</h3><hr/>
+	<div class="col-md-5 col-md-offset-4" style="padding:10px;">
+				<h3 style="margin-bottom:25px;text-align:center;">Feedback Form</h3><hr/>
 				<p class="alert alert-info">Thank you for taking your time to contact us. <br/>We'll get back to you in less than 24 hours if need be.</p>
 				<form method="POST">
 					 <br style="clear:both">
@@ -148,6 +148,8 @@
 	       				<button type="submit" id="submit" name="submit" class="btn btn-primary pull-right">Submit Form</button>
 	       		</form>
 			</div>
+			<div class="processRequest" style="display:none">{{>smsLoading}}</div>
+
 </template>
 
 <template name="notFound">
