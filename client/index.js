@@ -120,7 +120,6 @@ Template.feedback.events({
 //    .each((i)=>{Template.registerHelper(i, helpers[i])})
 //    .value()
 // }
-
 function registerGlobalHelpers(helpers){
   _.each(helpers, (fn, name) => { Template.registerHelper(name, fn); });
  }
