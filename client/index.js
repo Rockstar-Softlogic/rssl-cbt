@@ -73,7 +73,24 @@ Template.login.events({
     }
 });
 
-
+Template.feedback.events({
+    'submit form':function(e){
+        e.preventDefault();
+        let subject = e.target.subject.value,
+            message = e.target.message.value,
+            email = e.target.email?e.target.email.value:Meteor.user().emails[0].address;
+        console.log(subject, message, email);
+        let mailObject = {email:email,subject:subject,message:message};
+        Meteor.call("sendFeedback",mailObject,function(err,result){
+            if(err){
+                bootbox.alert(err);
+            }else{
+                bootbox.alert("Message was sent. Thank you!");
+                FlowRouter.go("/");
+            }
+        })     
+    }
+});
 // function registerGlobalHelpers(helpers){
 //   _.chain(helpers)
 //    .keys()

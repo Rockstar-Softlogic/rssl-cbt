@@ -22,14 +22,15 @@ Template.staffDashboard.helpers({
 		}
 	},
 	studentCount:function(){
-		let allStudent = Meteor.users.find({"_id":{$ne:Meteor.userId()},"profile.currentClass":{$ne:"Graduated"}}).count(),
+		let allStudent = Meteor.users.find({"_id":{$ne:Meteor.userId()}}).count(),
 			jss1 = Meteor.users.find({"_id":{$ne:Meteor.userId()},"profile.currentClass":"JSS1"}).count(),
 			jss2 = Meteor.users.find({"_id":{$ne:Meteor.userId()},"profile.currentClass":"JSS2"}).count(),
 			jss3 = Meteor.users.find({"_id":{$ne:Meteor.userId()},"profile.currentClass":"JSS3"}).count(),
 			sss1 = Meteor.users.find({"_id":{$ne:Meteor.userId()},"profile.currentClass":"SSS1"}).count(),
 			sss2 = Meteor.users.find({"_id":{$ne:Meteor.userId()},"profile.currentClass":"SSS2"}).count(),
 			sss3 = Meteor.users.find({"_id":{$ne:Meteor.userId()},"profile.currentClass":"SSS3"}).count();
-		return {allStudent:allStudent,jss1:jss1,jss2:jss2,jss3:jss3,sss1:sss1,sss2:sss2,sss3:sss3};
+			graduated = Meteor.users.find({"_id":{$ne:Meteor.userId()},"profile.currentClass":"Graduated"}).count();
+		return {allStudent:allStudent,jss1:jss1,jss2:jss2,jss3:jss3,sss1:sss1,sss2:sss2,sss3:sss3,graduated:graduated};
 	}
 
 });
