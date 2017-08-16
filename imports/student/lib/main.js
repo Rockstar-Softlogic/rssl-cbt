@@ -25,6 +25,7 @@ Meteor.methods({
 			throw new Meteor.Error("401", "Your result for this exam is already available.");
 		}
 		let exam = g.Exams.findOne({"_id":id});	
+			if(!exam){throw new Meteor.Error("401", "Exam not available anymore");}
 		let freshAnswer = g.StAnswers.insert({examId:id,
 											studentId:this.userId,
 											class:exam.class,

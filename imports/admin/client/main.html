@@ -120,7 +120,7 @@
 
 <template name="examsList">
 	{{#if Template.subscriptionsReady}}
-	<div class="col-md-10">
+	<div class="col-md-11">
 		<h2>My Examinations Listing</h2><hr/>
 		<a href="{{pathFor 'newExam'}}" class="btn btn-primary btn-xs"><span class="fa fa-plus"></span> New Exam</a>
 		<a href="{{pathFor 'uploadExam'}}" class="btn btn-primary btn-xs"><span class="fa fa-upload"></span> Upload Exam</a>
@@ -239,7 +239,7 @@
 				<option value="{{this}}">{{this}}</option>
 				{{/each}}
 			</select>
-			<input type="number" name="minute" required placeholder="Time taken" min="10" max="180">
+			<input type="number" name="minute" required placeholder="Time taken" min="4" max="300">
 			<input type="checkbox" name="publish" value=""> Publish now
 			<button type="submit" class="btn btn-danger">Confirm Upload</button>
 		</form>

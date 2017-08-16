@@ -414,7 +414,11 @@ Template.resultList.helpers({
 		if(result){
 			result.forEach(function(res){
 				let st = Meteor.users.findOne({"_id":res.studentId});
-					res.profile = st.profile;
+					if(st){
+						res.profile = st.profile;
+					}else{
+						res.profile = {firstName:"Unknown",lastName:"Unknown",studentId:"Empty Id"};
+					}
 					res.answers?res.correctAnswers=g.countCorrectAnswer(res.answers):false;
 				return res;
 			});

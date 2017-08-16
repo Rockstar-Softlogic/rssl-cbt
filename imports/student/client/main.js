@@ -107,12 +107,9 @@ Template.stDoExam.onRendered(function(){
 		let examId = Session.get("examId");
 		if(!examId || examId!==id){
 			FlowRouter.go("stExams");
-			console.log("throw is in session");
 		}else{
 			Meteor.call("initAnswer",id,function(error){
 				if(error){
-			console.log("throw is in meteor call");
-
 					FlowRouter.go("stExams");
 				}
 			});
@@ -130,7 +127,6 @@ Template.stDoExam.helpers({
 			// Meteor.setTimeout(function(){
 			// 	$("form#questionsList").submit();
 			// },5000);
-		
 	},
 	timeOut:function(){
 		let id = FlowRouter.getParam("id");
@@ -164,6 +160,14 @@ Template.stDoExam.events({
 			}else{
 				g.notice("Your Examination was submitted successfully. Good luck.");
 				FlowRouter.go("stExams");
+			}
+		});
+	},
+	'click button#examSubmit':function(e){
+		e.preventDefault();
+		bootbox.confirm("<h4><b>Are you sure to submit this exam?</b></h4>",function(result){
+			if(result){
+				$("form#questionsList").submit();
 			}
 		});
 	},

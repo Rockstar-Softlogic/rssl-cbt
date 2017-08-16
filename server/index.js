@@ -3,7 +3,7 @@ import { Email } from 'meteor/email';
 import '../imports/admin/server/main.js';
 import '../imports/student/server/main.js';
 
-
+//////////////////////////
 Meteor.startup(() => {
   // code to run on server at startup
   process.env.MAIL_URL = "smtps://postmaster%40sandbox64c23d2898f143a89139ad9d8f840f3b.mailgun.org:5130f0c77d236008a9ca0333ebe7bf1a@smtp.mailgun.org:587";
